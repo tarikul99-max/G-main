@@ -119,12 +119,27 @@ window.closeModalOutside = function(event, modalId) {
 // ============================================================
 // TOGGLE GROUP FIELD
 // ============================================================
-window.toggleGroupField = function(className) {
+function toggleGroupField(className) {
     const groupContainer = document.getElementById('groupFieldContainer');
     const groupSelect = document.getElementById('cousinGroup');
     const requiredMsg = document.getElementById('groupRequiredMsg');
     
     if (!groupContainer || !groupSelect) return;
+    
+    // SSC Special এর জন্য গ্রুপ ফিল্ড সম্পূর্ণ লুকান
+    if (className === 'SSC Special') {
+        groupContainer.style.display = 'none';
+        groupSelect.required = false;
+        groupSelect.value = '';
+        if (requiredMsg) {
+            requiredMsg.textContent = '🎯 SSC Special ক্লাসের জন্য গ্রুপ প্রয়োজন নেই';
+            requiredMsg.style.color = '#ffd700';
+        }
+        return;
+    }
+    
+    // অন্যান্য ক্লাসের জন্য দেখান
+    groupContainer.style.display = 'block';
     
     if (isGroupRequired(className)) {
         groupSelect.required = true;
@@ -136,11 +151,12 @@ window.toggleGroupField = function(className) {
         groupSelect.required = false;
         groupSelect.value = '';
         if (requiredMsg) {
-            requiredMsg.textContent = 'গ্রুপ নির্বাচন ঐচ্ছিক';
+            requiredMsg.textContent = 'গ্রুপ নির্বাচন ঐচ্ছিক (শুধু Nine, Ten এর জন্য আবশ্যক)';
             requiredMsg.style.color = 'rgba(255,255,255,0.4)';
         }
     }
-};
+}
+window.toggleGroupField = toggleGroupField;
 
 // ============================================================
 // LOGIN
@@ -401,12 +417,12 @@ function renderClassButtons() {
     allClasses.forEach(cls => {
         const btn = document.createElement('button');
         btn.className = 'class-btn' + (selectedClass === cls ? ' active' : '');
-        btn.textContent = cls;
+        btn.textContent = cls === 'SSC Special' ? '🎯 ' + cls : cls;
         btn.onclick = () => {
             selectedClass = cls;
             renderClassButtons();
             renderClassStudents(cls);
-            document.getElementById('selectedClassName').textContent = cls;
+            document.getElementById('selectedClassName').textContent = cls === 'SSC Special' ? '🎯 ' + cls : cls;
             toggleGroupField(cls);
         };
         container.appendChild(btn);
@@ -474,7 +490,8 @@ document.getElementById('addCousinBtn').addEventListener('click', () => {
         return;
     }
     
-    if (isGroupRequired(selectedClass)) {
+    // SSC Special ক্লাসের জন্য গ্রুপ চেক করবেন না
+    if (selectedClass !== 'SSC Special' && isGroupRequired(selectedClass)) {
         if (!group) {
             alert('⚠️ এই ক্লাসের জন্য গ্রুপ নির্বাচন আবশ্যক!');
             document.getElementById('cousinGroup').focus();
@@ -487,7 +504,7 @@ document.getElementById('addCousinBtn').addEventListener('click', () => {
         id: id,
         password: password,
         class: selectedClass,
-        group: group || '',
+        group: (selectedClass === 'SSC Special') ? '' : group || '',
         guardianPhone: guardianPhone || '',
         image: document.getElementById('studentImagePreview').src
     };
@@ -522,9 +539,10 @@ function populateClassCheckboxes() {
     if (!container) return;
     container.innerHTML = '<p style="font-size:13px; margin-bottom:8px; color:white;"><strong>ক্লাস নির্বাচন করুন:</strong></p>';
     allClasses.forEach(cls => {
+        const displayName = cls === 'SSC Special' ? '🎯 ' + cls : cls;
         const label = document.createElement('label');
         label.style.cssText = 'display:inline-block; margin-right:12px; font-size:13px; color:rgba(255,255,255,0.8);';
-        label.innerHTML = `<input type="checkbox" class="teacher-class-checkbox" value="${cls}"> ${cls}`;
+        label.innerHTML = `<input type="checkbox" class="teacher-class-checkbox" value="${cls}"> ${displayName}`;
         container.appendChild(label);
     });
 }
@@ -600,9 +618,15 @@ function renderTodayTomorrowRoutine() {
                         break;
                     }
                 }
+                // SSC Special এর জন্য আলাদা ডিসপ্লে
+                if (displayName === 'SSC Special') {
+                    displayName = '🎯 SSC Special';
+                }
                 const icon = GROUP_ICONS[groupName] || '';
                 const groupDisplay = groupName ? ` <span class="student-group-tag ${groupName.toLowerCase()}">${icon} ${groupName}</span>` : '';
-                html += `<p><strong>${displayName}</strong>${groupDisplay}: ${allRoutines[todayName][key]}</p>`;
+                // SSC Special এর জন্য গ্রুপ ট্যাগ দেখাবেন না
+                const finalDisplay = displayName === '🎯 SSC Special' ? displayName : displayName + groupDisplay;
+                html += `<p><strong>${finalDisplay}</strong>: ${allRoutines[todayName][key]}</p>`;
                 hasToday = true;
             }
         }
@@ -627,9 +651,13 @@ function renderTodayTomorrowRoutine() {
                         break;
                     }
                 }
+                if (displayName === 'SSC Special') {
+                    displayName = '🎯 SSC Special';
+                }
                 const icon = GROUP_ICONS[groupName] || '';
                 const groupDisplay = groupName ? ` <span class="student-group-tag ${groupName.toLowerCase()}">${icon} ${groupName}</span>` : '';
-                html += `<p><strong>${displayName}</strong>${groupDisplay}: ${allRoutines[tomorrowName][key]}</p>`;
+                const finalDisplay = displayName === '🎯 SSC Special' ? displayName : displayName + groupDisplay;
+                html += `<p><strong>${finalDisplay}</strong>: ${allRoutines[tomorrowName][key]}</p>`;
                 hasTomorrow = true;
             }
         }
@@ -658,9 +686,23 @@ function renderRoutineEditor() {
     const groupName = groupSelect ? groupSelect.value : '';
     
     let html = `<div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:20px;">
-        <h4 style="margin-bottom:15px; color:white;">📝 ${className} - ${dayName} ${groupName ? '(' + getGroupDisplayName(groupName) + ')' : ''}</h4>`;
+        <h4 style="margin-bottom:15px; color:white;">📝 ${className === 'SSC Special' ? '🎯 ' + className : className} - ${dayName} ${groupName ? '(' + getGroupDisplayName(groupName) + ')' : ''}</h4>`;
     
-    if (isGroupRequired(className)) {
+    // SSC Special ক্লাসের জন্য গ্রুপ দেখাবেন না
+    if (className === 'SSC Special') {
+        const currentValue = allRoutines[dayName] && allRoutines[dayName][className] ? allRoutines[dayName][className] : '';
+        html += `
+            <div style="display:flex; gap:10px; align-items:center; margin-top:10px;">
+                <span style="font-weight:bold; min-width:60px; color:white;">বিষয়:</span>
+                <input type="text" id="routineSingleInput" value="${currentValue}" placeholder="বিষয় লিখুন..." style="flex:1; margin-bottom:0; color:white;">
+            </div>
+        `;
+        html += `
+            <p style="font-size:12px; color:rgba(255,255,255,0.5); margin-top:12px;">
+                <i class="fas fa-info-circle"></i> 🎯 SSC Special ক্লাসের জন্য আলাদা গ্রুপ প্রয়োজন নেই
+            </p>
+        `;
+    } else if (isGroupRequired(className)) {
         const groupsToShow = groupName ? [groupName] : GROUP_LIST;
         
         groupsToShow.forEach(grp => {
@@ -675,6 +717,11 @@ function renderRoutineEditor() {
                 </div>
             `;
         });
+        html += `
+            <p style="font-size:12px; color:rgba(255,255,255,0.5); margin-top:12px;">
+                <i class="fas fa-info-circle"></i> ⚠️ প্রতিটি গ্রুপের জন্য আলাদা রুটিন দিন
+            </p>
+        `;
     } else {
         const currentValue = allRoutines[dayName] && allRoutines[dayName][className] ? allRoutines[dayName][className] : '';
         html += `
@@ -683,14 +730,13 @@ function renderRoutineEditor() {
                 <input type="text" id="routineSingleInput" value="${currentValue}" placeholder="বিষয় লিখুন..." style="flex:1; margin-bottom:0; color:white;">
             </div>
         `;
+        html += `
+            <p style="font-size:12px; color:rgba(255,255,255,0.5); margin-top:12px;">
+                <i class="fas fa-info-circle"></i> গ্রুপ প্রয়োজন নেই
+            </p>
+        `;
     }
     
-    html += `
-        <p style="font-size:12px; color:rgba(255,255,255,0.5); margin-top:12px;">
-            <i class="fas fa-info-circle"></i> 
-            ${isGroupRequired(className) ? '⚠️ প্রতিটি গ্রুপের জন্য আলাদা রুটিন দিন' : 'গ্রুপ প্রয়োজন নেই'}
-        </p>
-    `;
     html += '</div>';
     
     html += `<div style="margin-top:20px;">
@@ -707,7 +753,15 @@ function renderRoutineEditor() {
                 <tbody>`;
     
     allClasses.forEach(cls => {
-        if (isGroupRequired(cls)) {
+        if (cls === 'SSC Special') {
+            const val = allRoutines[dayName] && allRoutines[dayName][cls] ? allRoutines[dayName][cls] : '-';
+            const isActive = (cls === className && !groupName);
+            html += `<tr style="${isActive ? 'background:rgba(255,215,0,0.05);' : ''}">
+                <td>🎯 ${cls}</td>
+                <td><span class="ssc-special-badge">🎯 SSC</span></td>
+                <td>${val}</td>
+            </tr>`;
+        } else if (isGroupRequired(cls)) {
             GROUP_LIST.forEach(grp => {
                 const key = cls + '_' + grp;
                 const val = allRoutines[dayName] && allRoutines[dayName][key] ? allRoutines[dayName][key] : '-';
@@ -724,7 +778,7 @@ function renderRoutineEditor() {
             const isActive = (cls === className && !groupName);
             html += `<tr style="${isActive ? 'background:rgba(255,215,0,0.05);' : ''}">
                 <td>${cls}</td>
-                <td>${cls === 'SSC Special' ? '<span class="ssc-special-badge">🎯 SSC</span>' : '-'}</td>
+                <td>-</td>
                 <td>${val}</td>
             </tr>`;
         }
@@ -786,7 +840,15 @@ function renderRoutineModal() {
     html += '</tr></thead><tbody>';
     
     allClasses.forEach(cls => {
-        if (isGroupRequired(cls)) {
+        if (cls === 'SSC Special') {
+            html += `<tr><td><strong>🎯 ${cls}</strong></td><td><span class="ssc-special-badge">🎯 SSC</span></td>`;
+            days.forEach(day => {
+                const val = allRoutines[day] && allRoutines[day][cls] ? allRoutines[day][cls] : '-';
+                const isToday = day === todayName;
+                html += `<td style="${isToday ? 'background:rgba(255,215,0,0.1); font-weight:bold;' : ''}">${val}</td>`;
+            });
+            html += '</tr>';
+        } else if (isGroupRequired(cls)) {
             GROUP_LIST.forEach(grp => {
                 const key = cls + '_' + grp;
                 const icon = GROUP_ICONS[grp] || '';
@@ -799,7 +861,7 @@ function renderRoutineModal() {
                 html += '</tr>';
             });
         } else {
-            html += `<tr><td><strong>${cls}</strong></td><td>${cls === 'SSC Special' ? '<span class="ssc-special-badge">🎯 SSC</span>' : '-'}</td>`;
+            html += `<tr><td><strong>${cls}</strong></td><td>-</td>`;
             days.forEach(day => {
                 const val = allRoutines[day] && allRoutines[day][cls] ? allRoutines[day][cls] : '-';
                 const isToday = day === todayName;
@@ -864,7 +926,7 @@ function renderStudentOwnRoutine() {
     let html = `<div style="margin-bottom:15px; display:flex; justify-content:space-between; flex-wrap:wrap; align-items:center;">
         <div>
             <p style="font-size:16px;"><strong>📚 ক্লাস:</strong> ${className === 'SSC Special' ? '<span class="ssc-special-badge">🎯 SSC Special</span>' : className} 
-            ${groupName ? '| <span class="student-group-tag ' + groupName.toLowerCase() + '">' + GROUP_ICONS[groupName] + ' ' + groupName + '</span>' : ''}</p>
+            ${groupName && className !== 'SSC Special' ? '| <span class="student-group-tag ' + groupName.toLowerCase() + '">' + GROUP_ICONS[groupName] + ' ' + groupName + '</span>' : ''}</p>
             <p style="font-size:14px; color:rgba(255,255,255,0.7);"><strong>📅 আজ:</strong> ${todayBangla} (${todayName})</p>
         </div>
         <div>
@@ -875,7 +937,7 @@ function renderStudentOwnRoutine() {
     </div>`;
     
     let routineKey = className;
-    if (groupName && isGroupRequired(className)) {
+    if (groupName && className !== 'SSC Special' && isGroupRequired(className)) {
         routineKey = className + '_' + groupName;
     }
     
@@ -934,7 +996,7 @@ function populateAttendanceClassSelect() {
     allClasses.forEach(cls => {
         const option = document.createElement('option');
         option.value = cls;
-        option.textContent = cls;
+        option.textContent = cls === 'SSC Special' ? '🎯 ' + cls : cls;
         classSelect.appendChild(option);
     });
     if (selectedValue && allClasses.includes(selectedValue)) {
@@ -951,7 +1013,7 @@ function populateRoutineClassSelect() {
     allClasses.forEach(cls => {
         const option = document.createElement('option');
         option.value = cls;
-        option.textContent = cls;
+        option.textContent = cls === 'SSC Special' ? '🎯 ' + cls : cls;
         classSelect.appendChild(option);
     });
     if (selectedValue && allClasses.includes(selectedValue)) {
@@ -1122,7 +1184,7 @@ function renderTeacherClassStudents(className) {
         }
     }
     if (Object.keys(students).length === 0) {
-        container.innerHTML = `<p style="color:rgba(255,255,255,0.5);">${className} ক্লাসে কোনো ছাত্র/ছাত্রী নেই</p>`;
+        container.innerHTML = `<p style="color:rgba(255,255,255,0.5);">${className === 'SSC Special' ? '🎯 SSC Special' : className} ক্লাসে কোনো ছাত্র/ছাত্রী নেই</p>`;
         return;
     }
     let html = `<h3 style="color:white;">${className === 'SSC Special' ? '🎯 SSC Special' : className} ক্লাসের ছাত্র/ছাত্রী</h3><div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:10px;">`;
@@ -1134,7 +1196,7 @@ function renderTeacherClassStudents(className) {
             <img src="${s.image || 'https://ui-avatars.com/api/?background=0a3b2e&color=fff&name=' + encodeURIComponent(s.name)}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid #ffd700;">
             <p style="margin-top:5px; color:white;"><strong>${s.name}</strong></p>
             <p style="font-size:12px; color:rgba(255,255,255,0.5);">${s.id}</p>
-            ${s.group ? `<p style="font-size:11px; margin-top:3px;"><span class="student-group-tag ${groupClass}">${icon} ${s.group}</span></p>` : ''}
+            ${s.group && s.class !== 'SSC Special' ? `<p style="font-size:11px; margin-top:3px;"><span class="student-group-tag ${groupClass}">${icon} ${s.group}</span></p>` : ''}
             ${s.class === 'SSC Special' ? `<p style="margin-top:3px;"><span class="ssc-special-badge">🎯 SSC Special</span></p>` : ''}
         </div>`;
     }
@@ -1150,7 +1212,7 @@ function renderStudentInfo(studentData) {
     document.getElementById('studentNameDisplay').textContent = studentData.name;
     document.getElementById('studentClassDisplay').textContent = studentData.class === 'SSC Special' ? '🎯 SSC Special' : studentData.class;
     const icon = GROUP_ICONS[studentData.group] || '';
-    document.getElementById('studentGroupDisplay').textContent = studentData.group ? icon + ' ' + studentData.group : '-';
+    document.getElementById('studentGroupDisplay').textContent = (studentData.group && studentData.class !== 'SSC Special') ? icon + ' ' + studentData.group : '-';
     document.getElementById('studentIdDisplay').textContent = studentData.id;
     
     renderStudentOwnRoutine();
@@ -1211,7 +1273,8 @@ function loadStudentAttendance(className, groupName, date) {
     for (let key in allStudents) {
         const student = allStudents[key];
         if (student.class === className) {
-            if (groupName !== 'all' && student.group !== groupName) {
+            // SSC Special এর জন্য গ্রুপ ফিল্টার করবেন না
+            if (className !== 'SSC Special' && groupName !== 'all' && student.group !== groupName) {
                 continue;
             }
             students[key] = student;
@@ -1230,9 +1293,11 @@ function loadStudentAttendance(className, groupName, date) {
         const attKey = `${className}_${date}`;
         const isPresent = attendanceData[attKey] && attendanceData[attKey][key] === true;
         const icon = GROUP_ICONS[student.group] || '';
+        const groupDisplay = (student.group && className !== 'SSC Special') ? '<span class="student-group-tag ' + student.group.toLowerCase() + '">' + icon + ' ' + student.group + '</span>' : '';
+        const sscBadge = student.class === 'SSC Special' ? '<span class="ssc-special-badge">🎯 SSC</span>' : '';
         html += `<div class="student-att-row">
             <img src="${student.image || 'https://ui-avatars.com/api/?background=0a3b2e&color=fff&name=' + encodeURIComponent(student.name)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
-            <span style="flex:1; color:white;">${student.name} ${student.group ? '<span class="student-group-tag ' + student.group.toLowerCase() + '">' + icon + ' ' + student.group + '</span>' : ''}</span>
+            <span style="flex:1; color:white;">${student.name} ${groupDisplay} ${sscBadge}</span>
             <span style="font-size:12px; color:rgba(255,255,255,0.5);">${student.id}</span>
             <label class="toggle-switch">
                 <input type="checkbox" class="attendance-checkbox" data-student="${key}" ${isPresent ? 'checked' : ''}>
@@ -1365,7 +1430,7 @@ function renderClassMonthlyCalendar() {
     
     monthSelector.innerHTML = `
         <button class="btn btn-sm btn-blue" onclick="changeClassMonth(-1)">◀</button>
-        <span style="font-weight:bold; color:white;">${currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })} - ${className} ${groupName !== 'all' ? '(' + getGroupDisplayName(groupName) + ')' : ''}</span>
+        <span style="font-weight:bold; color:white;">${currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })} - ${className === 'SSC Special' ? '🎯 ' + className : className} ${groupName !== 'all' && className !== 'SSC Special' ? '(' + getGroupDisplayName(groupName) + ')' : ''}</span>
         <button class="btn btn-sm btn-blue" onclick="changeClassMonth(1)">▶</button>
     `;
     
@@ -1373,7 +1438,8 @@ function renderClassMonthlyCalendar() {
     for (let key in allStudents) {
         const student = allStudents[key];
         if (student.class === className) {
-            if (groupName !== 'all' && student.group !== groupName) {
+            // SSC Special এর জন্য গ্রুপ ফিল্টার করবেন না
+            if (className !== 'SSC Special' && groupName !== 'all' && student.group !== groupName) {
                 continue;
             }
             students[key] = student;
@@ -1454,7 +1520,7 @@ function renderStudentFeedbackArea() {
     const student = allStudents[currentUserKey];
     const className = student.class;
     const icon = GROUP_ICONS[student.group] || '';
-    let html = `<p style="margin-bottom:15px; color:white;"><strong>আপনার ক্লাস:</strong> ${className === 'SSC Special' ? '🎯 SSC Special' : className} ${student.group ? '(' + icon + ' ' + student.group + ')' : ''}</p>
+    let html = `<p style="margin-bottom:15px; color:white;"><strong>আপনার ক্লাস:</strong> ${className === 'SSC Special' ? '🎯 SSC Special' : className} ${student.group && className !== 'SSC Special' ? '(' + icon + ' ' + student.group + ')' : ''}</p>
         <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:20px;">
             <textarea id="feedbackText" rows="3" placeholder="আপনার মতামত লিখুন..." style="width:100%; border-radius:15px; color:white;"></textarea>
             <button class="btn btn-orange" onclick="submitFeedback()" style="margin-top:10px;"><i class="fas fa-paper-plane"></i> পাঠান</button>
@@ -1479,7 +1545,7 @@ function renderMyFeedback() {
             const icon = GROUP_ICONS[fb.group] || '';
             html += `<div class="feedback-item">
                 <p style="color:white;">${fb.text}</p>
-                <p style="font-size:11px; color:rgba(255,255,255,0.5);">${fb.date || ''} ${fb.group ? '| ' + icon + ' ' + fb.group : ''}</p>
+                <p style="font-size:11px; color:rgba(255,255,255,0.5);">${fb.date || ''} ${fb.group && fb.className !== 'SSC Special' ? '| ' + icon + ' ' + fb.group : ''}</p>
                 <button class="delete-btn" onclick="deleteFeedback('${key}')">মুছুন</button>
             </div>`;
         }
@@ -1547,8 +1613,9 @@ function renderFeedbackList() {
         if (filter !== 'all' && fb.className !== filter) continue;
         count++;
         const icon = GROUP_ICONS[fb.group] || '';
+        const groupDisplay = (fb.group && fb.className !== 'SSC Special') ? ' - ' + icon + ' ' + fb.group : '';
         html += `<div class="feedback-item">
-            <p style="color:white;"><strong>${fb.studentName}</strong> (${fb.className === 'SSC Special' ? '🎯 SSC Special' : fb.className}${fb.group ? ' - ' + icon + ' ' + fb.group : ''})</p>
+            <p style="color:white;"><strong>${fb.studentName}</strong> (${fb.className === 'SSC Special' ? '🎯 SSC Special' : fb.className}${groupDisplay})</p>
             <p style="color:white;">${fb.text}</p>
             <p style="font-size:11px; color:rgba(255,255,255,0.5);">${fb.date || ''}</p>
             <button class="delete-btn" onclick="deleteFeedback('${key}')">মুছুন</button>
