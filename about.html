@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>MASTERMIND ACADEMY Result Management System</title>
+    <title>Glorious Education Care</title>
     <link rel="icon" type="image/x-icon" href="mastermined.jpg">
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -579,15 +579,12 @@
             <div class="header-left">
                 <img src="mastermined.jpg" alt="Logo" class="header-logo">
                 <div class="main-title-box">
-                    <h1>MASTERMIND</h1><span class="academy-text">ACADEMY</span>
-                    <div class="slogan">&nbsp;&nbsp;সম্ভাবনার নতুন দিগন্তে আপনাকে স্বাগত!....</div>
+                    <h1>GLORIOUS</h1><span>Education Care</span>
+                    <div class="slogan">&nbsp;&nbsp; সৃজনশীল প্রতিভার অন্বেষণে..........</div>
                 </div>
             </div>
             <div class="header-right-address">
-                <i class="fas fa-map-marker-alt"></i> এসটি প্লাজা-২য় তলা
-                (গ্লোবাল ইসলামি ব্যাংকের পাশে)
-                বারবাকিয়া বাজার, পেকুয়া, কক্সবাজার।<br>
-                📞 01623209091 || 01623209090
+                <i class="fas fa-map-marker-alt"></i>ফরিদুল হক চৌধুরী মার্কেট (২য় তলা),<br>পেকুয়া চৌমুহনীর পশ্চিম পার্শ্বে, পেকুয়া।<br>📞 ০১৮৬৮-৬৫৩৭২২
             </div>
         </div>
     </div>
@@ -651,17 +648,23 @@
             <tbody id="tBody"></tbody>
         </table>
     </div>
-    <div class="footer"><p><i class="fas fa-copyright"></i> MASTERMIND ACADEMY | Stable Result Management</p></div>
+    <div class="footer"><p><i class="fas fa-copyright"></i> <h1>GLORIOUS</h1><span>Education Care</span></p></div>
 </div>
 <div id="autoSaveToast" class="auto-save-toast">✅ স্বয়ংক্রিয়ভাবে সংরক্ষিত</div>
 
 <script>
+    // Updated Firebase configuration with the new project credentials
     const firebaseConfig = {
-        apiKey: "AIzaSyCcwdSFN9L8kD7QayZgaoqUvTVjbpzQ2mI",
-        authDomain: "result-sheet-099.firebaseapp.com",
-        databaseURL: "https://result-sheet-099-default-rtdb.firebaseio.com/",
-        projectId: "result-sheet-099"
+        apiKey: "AIzaSyCWdtsJQ_A6BnJ8mX9Y3St5xPJA0NGve5s",
+        authDomain: "g-result-16d63.firebaseapp.com",
+        projectId: "g-result-16d63",
+        storageBucket: "g-result-16d63.firebasestorage.app",
+        messagingSenderId: "678771171699",
+        appId: "1:678771171699:web:fddce1958ef95176fae506",
+        measurementId: "G-5N8B8CKRMN"
     };
+
+    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
