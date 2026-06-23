@@ -1,10 +1,3 @@
-// ============================================================
-// FIREBASE CONFIGURATION (v9+ Modular)
-// ============================================================
-import { initializeApp } from "firebase/app";
-import { getDatabase, ref, set, push, onValue, update, remove, get, child } from "firebase/database";
-import { getAnalytics } from "firebase/analytics";
-
 const firebaseConfig = {
     apiKey: "AIzaSyAe_LzZAKonCZ5IOakXyqGeErTU0RGTYr4",
     authDomain: "g-main-option.firebaseapp.com",
@@ -15,21 +8,15 @@ const firebaseConfig = {
     measurementId: "G-EVNFKCMFNZ"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const analytics = getAnalytics(app);
+// Initialize Firebase (CDN version)
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
 // ============================================================
 // EXPOSE TO GLOBAL SCOPE (for HTML onclick events)
 // ============================================================
 window.db = db;
-window.ref = ref;
-window.set = set;
-window.push = push;
-window.onValue = onValue;
-window.update = update;
-window.remove = remove;
-window.get = get;
+window.firebase = firebase;
 
 // ============================================================
 // GLOBAL VARIABLES
