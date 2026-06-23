@@ -1,3 +1,8 @@
+// ============================================================
+// FIREBASE CONFIGURATION (CDN Version - Compatible)
+// ============================================================
+
+// Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyAe_LzZAKonCZ5IOakXyqGeErTU0RGTYr4",
     authDomain: "g-main-option.firebaseapp.com",
@@ -13,7 +18,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 // ============================================================
-// EXPOSE TO GLOBAL SCOPE (for HTML onclick events)
+// EXPOSE TO GLOBAL SCOPE
 // ============================================================
 window.db = db;
 window.firebase = firebase;
@@ -45,7 +50,7 @@ const GROUP_ICONS = {
     'Commerce': '💼',
     'Arts': '⚖️'
 };
-const GROUP_REQUIRED_CLASSES = ['Nine', 'Ten', 'SSC Special'];
+const GROUP_REQUIRED_CLASSES = ['Nine', 'Ten']; // SSC Special বাদ দেওয়া হয়েছে
 
 // ============================================================
 // DOM REFS
@@ -168,8 +173,8 @@ function performLogin(id, password, role) {
             return false;
         }
     } else if (role === 'teacher') {
-        const teacherRef = ref(db, 'teachers');
-        onValue(teacherRef, (snapshot) => {
+        const teacherRef = db.ref('teachers');
+        teacherRef.once('value', (snapshot) => {
             const teachers = snapshot.val() || {};
             let found = false;
             for (let key in teachers) {
@@ -187,11 +192,11 @@ function performLogin(id, password, role) {
             if (!found) {
                 alert('ভুল আইডি বা পাসওয়ার্ড!');
             }
-        }, { onlyOnce: true });
+        });
         return true;
     } else if (role === 'student') {
-        const studentRef = ref(db, 'students');
-        onValue(studentRef, (snapshot) => {
+        const studentRef = db.ref('students');
+        studentRef.once('value', (snapshot) => {
             const students = snapshot.val() || {};
             let found = false;
             for (let key in students) {
@@ -209,7 +214,7 @@ function performLogin(id, password, role) {
             if (!found) {
                 alert('ভুল আইডি বা পাসওয়ার্ড!');
             }
-        }, { onlyOnce: true });
+        });
         return true;
     }
     return false;
@@ -227,8 +232,8 @@ function checkSession() {
             showApp();
             setupAdminUI();
         } else if (role === 'teacher') {
-            const teacherRef = ref(db, 'teachers/' + user);
-            onValue(teacherRef, (snapshot) => {
+            const teacherRef = db.ref('teachers/' + user);
+            teacherRef.once('value', (snapshot) => {
                 const teacherData = snapshot.val();
                 if (teacherData) {
                     currentUserName = teacherData.name;
@@ -238,10 +243,10 @@ function checkSession() {
                     clearSession();
                     loginScreen.style.display = 'flex';
                 }
-            }, { onlyOnce: true });
+            });
         } else if (role === 'student') {
-            const studentRef = ref(db, 'students/' + user);
-            onValue(studentRef, (snapshot) => {
+            const studentRef = db.ref('students/' + user);
+            studentRef.once('value', (snapshot) => {
                 const studentData = snapshot.val();
                 if (studentData) {
                     currentUserName = studentData.name;
@@ -251,7 +256,7 @@ function checkSession() {
                     clearSession();
                     loginScreen.style.display = 'flex';
                 }
-            }, { onlyOnce: true });
+            });
         }
         return true;
     }
@@ -279,16 +284,16 @@ function showApp() {
 // LOAD ALL DATA
 // ============================================================
 function loadAllData() {
-    const teachersRef = ref(db, 'teachers');
-    onValue(teachersRef, (snapshot) => {
+    const teachersRef = db.ref('teachers');
+    teachersRef.on('value', (snapshot) => {
         allTeachers = snapshot.val() || {};
         renderTeachers();
         renderTeachersTable();
         renderTeacherGrid();
     });
 
-    const studentsRef = ref(db, 'students');
-    onValue(studentsRef, (snapshot) => {
+    const studentsRef = db.ref('students');
+    studentsRef.on('value', (snapshot) => {
         allStudents = snapshot.val() || {};
         renderClassButtons();
         if (selectedClass) {
@@ -307,8 +312,8 @@ function loadAllData() {
         populateRoutineClassSelect();
     });
 
-    const routinesRef = ref(db, 'routines');
-    onValue(routinesRef, (snapshot) => {
+    const routinesRef = db.ref('routines');
+    routinesRef.on('value', (snapshot) => {
         allRoutines = snapshot.val() || {};
         renderTodayTomorrowRoutine();
         renderRoutineEditor();
@@ -316,21 +321,21 @@ function loadAllData() {
         renderStudentOwnRoutine();
     });
 
-    const feedRef = ref(db, 'feed');
-    onValue(feedRef, (snapshot) => {
+    const feedRef = db.ref('feed');
+    feedRef.on('value', (snapshot) => {
         feedData = snapshot.val() || {};
         renderSocialFeed();
     });
 
-    const feedbackRef = ref(db, 'feedback');
-    onValue(feedbackRef, (snapshot) => {
+    const feedbackRef = db.ref('feedback');
+    feedbackRef.on('value', (snapshot) => {
         feedbackData = snapshot.val() || {};
         renderFeedbackList();
         renderStudentFeedbackArea();
     });
 
-    const attendanceRef = ref(db, 'attendance');
-    onValue(attendanceRef, (snapshot) => {
+    const attendanceRef = db.ref('attendance');
+    attendanceRef.on('value', (snapshot) => {
         attendanceData = snapshot.val() || {};
         if (currentRole === 'student' && currentUserKey) {
             renderStudentAttendance();
@@ -392,7 +397,7 @@ function renderTeachersTable() {
 
 window.deleteTeacher = function(key) {
     if (confirm('শিক্ষককে মুছতে চান?')) {
-        remove(ref(db, 'teachers/' + key));
+        db.ref('teachers/' + key).remove();
     }
 };
 
@@ -456,7 +461,7 @@ function renderClassStudents(className) {
 
 window.deleteStudent = function(key) {
     if (confirm('ছাত্র/ছাত্রীকে মুছতে চান?')) {
-        remove(ref(db, 'students/' + key));
+        db.ref('students/' + key).remove();
     }
 };
 
@@ -496,8 +501,8 @@ document.getElementById('addCousinBtn').addEventListener('click', () => {
         image: document.getElementById('studentImagePreview').src
     };
     
-    const refPath = ref(db, 'students');
-    push(refPath, newStudent).then(() => {
+    const newRef = db.ref('students').push();
+    newRef.set(newStudent).then(() => {
         document.getElementById('cousinName').value = '';
         document.getElementById('cousinId').value = '';
         document.getElementById('cousinPass').value = '';
@@ -555,8 +560,8 @@ document.getElementById('createTeacherBtn').addEventListener('click', () => {
         classes: classes,
         image: document.getElementById('teacherImagePreview').src
     };
-    const refPath = ref(db, 'teachers');
-    push(refPath, newTeacher).then(() => {
+    const newRef = db.ref('teachers').push();
+    newRef.set(newTeacher).then(() => {
         document.getElementById('newTeacherName').value = '';
         document.getElementById('newTeacherId').value = '';
         document.getElementById('newTeacherPass').value = '';
@@ -605,13 +610,11 @@ function renderTodayTomorrowRoutine() {
                         break;
                     }
                 }
-                // SSC Special এর জন্য আলাদা ডিসপ্লে
                 if (displayName === 'SSC Special') {
                     displayName = '🎯 SSC Special';
                 }
                 const icon = GROUP_ICONS[groupName] || '';
                 const groupDisplay = groupName ? ` <span class="student-group-tag ${groupName.toLowerCase()}">${icon} ${groupName}</span>` : '';
-                // SSC Special এর জন্য গ্রুপ ট্যাগ দেখাবেন না
                 const finalDisplay = displayName === '🎯 SSC Special' ? displayName : displayName + groupDisplay;
                 html += `<p><strong>${finalDisplay}</strong>: ${allRoutines[todayName][key]}</p>`;
                 hasToday = true;
@@ -675,7 +678,6 @@ function renderRoutineEditor() {
     let html = `<div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:20px;">
         <h4 style="margin-bottom:15px; color:white;">📝 ${className === 'SSC Special' ? '🎯 ' + className : className} - ${dayName} ${groupName ? '(' + getGroupDisplayName(groupName) + ')' : ''}</h4>`;
     
-    // SSC Special ক্লাসের জন্য গ্রুপ দেখাবেন না
     if (className === 'SSC Special') {
         const currentValue = allRoutines[dayName] && allRoutines[dayName][className] ? allRoutines[dayName][className] : '';
         html += `
@@ -787,7 +789,7 @@ function renderRoutineEditor() {
             if (!updatedRoutines[dayName]) updatedRoutines[dayName] = {};
             updatedRoutines[dayName][key] = value;
             
-            set(ref(db, 'routines'), updatedRoutines);
+            db.ref('routines').set(updatedRoutines);
         });
     });
     
@@ -807,7 +809,7 @@ function renderRoutineEditor() {
             if (!updatedRoutines[dayName]) updatedRoutines[dayName] = {};
             updatedRoutines[dayName][className] = value;
             
-            set(ref(db, 'routines'), updatedRoutines);
+            db.ref('routines').set(updatedRoutines);
         });
     }
 }
@@ -1260,7 +1262,6 @@ function loadStudentAttendance(className, groupName, date) {
     for (let key in allStudents) {
         const student = allStudents[key];
         if (student.class === className) {
-            // SSC Special এর জন্য গ্রুপ ফিল্টার করবেন না
             if (className !== 'SSC Special' && groupName !== 'all' && student.group !== groupName) {
                 continue;
             }
@@ -1314,7 +1315,7 @@ function saveAttendanceAutomatically() {
         const studentKey = cb.dataset.student;
         attData[studentKey] = cb.checked;
     });
-    set(ref(db, 'attendance/' + attKey), attData);
+    db.ref('attendance/' + attKey).set(attData);
 }
 
 document.getElementById('saveAttendanceBtn').addEventListener('click', () => {
@@ -1425,7 +1426,6 @@ function renderClassMonthlyCalendar() {
     for (let key in allStudents) {
         const student = allStudents[key];
         if (student.class === className) {
-            // SSC Special এর জন্য গ্রুপ ফিল্টার করবেন না
             if (className !== 'SSC Special' && groupName !== 'all' && student.group !== groupName) {
                 continue;
             }
@@ -1559,7 +1559,7 @@ window.submitFeedback = function() {
         text: text,
         date: new Date().toISOString().split('T')[0]
     };
-    push(ref(db, 'feedback'), feedback).then(() => {
+    db.ref('feedback').push(feedback).then(() => {
         const input = document.getElementById('feedbackText');
         if (input) input.value = '';
         alert('✅ মতামত পাঠানো হয়েছে');
@@ -1570,7 +1570,7 @@ window.submitFeedback = function() {
 
 window.deleteFeedback = function(key) {
     if (confirm('মতামত মুছতে চান?')) {
-        remove(ref(db, 'feedback/' + key));
+        db.ref('feedback/' + key).remove();
     }
 };
 
@@ -1660,7 +1660,7 @@ window.publishPost = function() {
         comments: {}
     };
     
-    push(ref(db, 'feed'), post).then(() => {
+    db.ref('feed').push(post).then(() => {
         const captionInput = document.getElementById('feedCaption');
         if (captionInput) captionInput.value = '';
         const previewContainer = document.getElementById('imagePreviewContainer');
@@ -1761,7 +1761,7 @@ window.addComment = function(postKey) {
         date: new Date().toISOString().split('T')[0],
         timestamp: Date.now()
     };
-    push(ref(db, `feed/${postKey}/comments`), comment).then(() => {
+    db.ref(`feed/${postKey}/comments`).push(comment).then(() => {
         input.value = '';
     }).catch((error) => {
         alert('❌ মন্তব্য করতে সমস্যা হয়েছে: ' + error.message);
@@ -1773,8 +1773,8 @@ window.likePost = function(postKey) {
         alert('আপনি লগইন করেননি');
         return;
     }
-    const postRef = ref(db, `feed/${postKey}`);
-    get(postRef).then((snapshot) => {
+    const postRef = db.ref(`feed/${postKey}`);
+    postRef.once('value', (snapshot) => {
         const currentData = snapshot.val();
         if (!currentData) return;
         if (!currentData.likedBy) currentData.likedBy = {};
@@ -1786,13 +1786,13 @@ window.likePost = function(postKey) {
             currentData.likedBy[currentUserKey] = true;
             currentData.likes++;
         }
-        set(postRef, currentData);
+        postRef.set(currentData);
     });
 };
 
 window.deletePost = function(postKey) {
     if (confirm('পোস্ট মুছতে চান?')) {
-        remove(ref(db, 'feed/' + postKey));
+        db.ref('feed/' + postKey).remove();
     }
 };
 
@@ -1825,6 +1825,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 console.log('📚 মাস্টারমাইন্ড অ্যাকাডেমি সিস্টেম লোড হয়েছে');
-console.log('🔥 Firebase v9+ Connected');
+console.log('🔥 Firebase Connected');
 console.log('✅ অটো-সেভ সক্রিয় আছে');
 console.log('✅ SSC Special ক্লাস হিসেবে আছে (গ্রুপ নয়)');
