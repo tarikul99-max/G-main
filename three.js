@@ -22,7 +22,9 @@ function init3DBackground() {
     const skyTexture = new THREE.CanvasTexture(canvas);
     scene.background = skyTexture;
     camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 1, 3000);
+    // FIXED: Locked camera position and angle
     camera.position.set(0, 14, 150);
+    camera.lookAt(0, 2, -30);
     renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -160,12 +162,10 @@ function init3DBackground() {
     flag.position.set(0, 9.8, 1.6);
     boat.add(flag);
     scene.add(boat);
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.maxPolarAngle = Math.PI * 0.48;
-    controls.minDistance = 30;
-    controls.maxDistance = 400;
-    controls.target.set(0, 2, -30);
-    controls.update();
+    
+    // FIXED: Removed OrbitControls for locked angle
+    // Camera is now fixed at position (0, 14, 150) looking at (0, 2, -30)
+    
     window.addEventListener('resize', onWindowResize);
 }
 
