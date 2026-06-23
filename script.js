@@ -1,17 +1,35 @@
 // ============================================================
-// FIREBASE CONFIGURATION
+// FIREBASE CONFIGURATION (v9+ Modular)
 // ============================================================
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, set, push, onValue, update, remove, get, child } from "firebase/database";
+import { getAnalytics } from "firebase/analytics";
+
 const firebaseConfig = {
-    apiKey: "AIzaSyD4xuqY5FDdiEwlYpkC1cfMEN1aIwPtB_A",
-    authDomain: "studentcom-3e387.firebaseapp.com",
-    projectId: "studentcom-3e387",
-    databaseURL: "https://studentcom-3e387-default-rtdb.firebaseio.com",
-    messagingSenderId: "284949876238",
-    appId: "1:284949876238:web:d6a8cde91411a033e9f65f"
+    apiKey: "AIzaSyAe_LzZAKonCZ5IOakXyqGeErTU0RGTYr4",
+    authDomain: "g-main-option.firebaseapp.com",
+    projectId: "g-main-option",
+    storageBucket: "g-main-option.firebasestorage.app",
+    messagingSenderId: "82515375288",
+    appId: "1:82515375288:web:12bfb9803af5e9bbbe704d",
+    measurementId: "G-EVNFKCMFNZ"
 };
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const analytics = getAnalytics(app);
+
+// ============================================================
+// EXPOSE TO GLOBAL SCOPE (for HTML onclick events)
+// ============================================================
+window.db = db;
+window.ref = ref;
+window.set = set;
+window.push = push;
+window.onValue = onValue;
+window.update = update;
+window.remove = remove;
+window.get = get;
 
 // ============================================================
 // GLOBAL VARIABLES
@@ -34,16 +52,39 @@ let feedImages = [];
 let selectedRoutineClass = null;
 let selectedRoutineDay = 'Sunday';
 
-// গ্রুপ লিস্ট - SSC Special বাদ
 const GROUP_LIST = ['Science', 'Commerce', 'Arts'];
 const GROUP_ICONS = {
     'Science': '🔬',
     'Commerce': '💼',
     'Arts': '⚖️'
 };
+const GROUP_REQUIRED_CLASSES = ['Nine', 'Ten', 'SSC Special'];
 
-// গ্রুপ প্রয়োজন এমন ক্লাস - SSC Special বাদ
-const GROUP_REQUIRED_CLASSES = ['Nine', 'Ten','SSC Special'];
+// ============================================================
+// DOM REFS
+// ============================================================
+const loginScreen = document.getElementById('loginScreen');
+const appContainer = document.getElementById('appContainer');
+const loginForm = document.getElementById('loginForm');
+const loginId = document.getElementById('loginId');
+const loginPassword = document.getElementById('loginPassword');
+const loginRole = document.getElementById('loginRole');
+const userNameDisplay = document.getElementById('userNameDisplay');
+const roleDisplay = document.getElementById('roleDisplay');
+const menuToggle = document.getElementById('menuToggle');
+const dropdownMenu = document.getElementById('dropdownMenu');
+
+// ============================================================
+// HELPERS
+// ============================================================
+function isGroupRequired(className) {
+    return GROUP_REQUIRED_CLASSES.includes(className);
+}
+
+function getGroupDisplayName(group) {
+    const icon = GROUP_ICONS[group] || '';
+    return icon ? icon + ' ' + group : group;
+}
 
 // ============================================================
 // SESSION MANAGEMENT
@@ -66,67 +107,19 @@ function clearSession() {
 }
 
 // ============================================================
-// DOM ELEMENTS
+// MODAL
 // ============================================================
-const loginScreen = document.getElementById('loginScreen');
-const appContainer = document.getElementById('appContainer');
-const loginForm = document.getElementById('loginForm');
-const loginId = document.getElementById('loginId');
-const loginPassword = document.getElementById('loginPassword');
-const loginRole = document.getElementById('loginRole');
-const userNameDisplay = document.getElementById('userNameDisplay');
-const roleDisplay = document.getElementById('roleDisplay');
-const menuToggle = document.getElementById('menuToggle');
-const dropdownMenu = document.getElementById('dropdownMenu');
-
-// ============================================================
-// BACKGROUND SLIDESHOW
-// ============================================================
-let slideIndex = 0;
-const slides = document.querySelectorAll('.bg-slide');
-
-function startSlideshow() {
-    if (slides.length === 0) return;
-    slides.forEach(s => s.classList.remove('active'));
-    slideIndex = (slideIndex + 1) % slides.length;
-    slides[slideIndex].classList.add('active');
-    setTimeout(startSlideshow, 5000);
-}
-
-if (slides.length > 0) {
-    slides[0].classList.add('active');
-    setTimeout(startSlideshow, 5000);
-}
-
-// ============================================================
-// MODAL FUNCTIONS
-// ============================================================
-function closeModalOutside(event, modalId) {
+window.closeModalOutside = function(event, modalId) {
     const modal = document.getElementById(modalId);
     if (event.target === modal) {
         modal.style.display = 'none';
     }
-}
+};
 
 // ============================================================
-// CHECK IF GROUP IS REQUIRED
+// TOGGLE GROUP FIELD
 // ============================================================
-function isGroupRequired(className) {
-    return GROUP_REQUIRED_CLASSES.includes(className);
-}
-
-// ============================================================
-// GET GROUP DISPLAY NAME
-// ============================================================
-function getGroupDisplayName(group) {
-    const icon = GROUP_ICONS[group] || '';
-    return icon ? icon + ' ' + group : group;
-}
-
-// ============================================================
-// TOGGLE GROUP FIELD VISIBILITY
-// ============================================================
-function toggleGroupField(className) {
+window.toggleGroupField = function(className) {
     const groupContainer = document.getElementById('groupFieldContainer');
     const groupSelect = document.getElementById('cousinGroup');
     const requiredMsg = document.getElementById('groupRequiredMsg');
@@ -144,13 +137,13 @@ function toggleGroupField(className) {
         groupSelect.value = '';
         if (requiredMsg) {
             requiredMsg.textContent = 'গ্রুপ নির্বাচন ঐচ্ছিক';
-            requiredMsg.style.color = 'rgba(255,255,255,0.5)';
+            requiredMsg.style.color = 'rgba(255,255,255,0.4)';
         }
     }
-}
+};
 
 // ============================================================
-// LOGIN SYSTEM
+// LOGIN
 // ============================================================
 function performLogin(id, password, role) {
     if (!id || !password) {
@@ -172,9 +165,9 @@ function performLogin(id, password, role) {
             return false;
         }
     } else if (role === 'teacher') {
-        const teacherRef = db.ref('teachers');
-        teacherRef.once('value', (snapshot) => {
-            const teachers = snapshot.val();
+        const teacherRef = ref(db, 'teachers');
+        onValue(teacherRef, (snapshot) => {
+            const teachers = snapshot.val() || {};
             let found = false;
             for (let key in teachers) {
                 if (teachers[key].id === id && teachers[key].password === password) {
@@ -191,12 +184,12 @@ function performLogin(id, password, role) {
             if (!found) {
                 alert('ভুল আইডি বা পাসওয়ার্ড!');
             }
-        });
+        }, { onlyOnce: true });
         return true;
     } else if (role === 'student') {
-        const studentRef = db.ref('students');
-        studentRef.once('value', (snapshot) => {
-            const students = snapshot.val();
+        const studentRef = ref(db, 'students');
+        onValue(studentRef, (snapshot) => {
+            const students = snapshot.val() || {};
             let found = false;
             for (let key in students) {
                 if (students[key].id === id && students[key].password === password) {
@@ -213,7 +206,7 @@ function performLogin(id, password, role) {
             if (!found) {
                 alert('ভুল আইডি বা পাসওয়ার্ড!');
             }
-        });
+        }, { onlyOnce: true });
         return true;
     }
     return false;
@@ -231,7 +224,8 @@ function checkSession() {
             showApp();
             setupAdminUI();
         } else if (role === 'teacher') {
-            db.ref('teachers/' + user).once('value', (snapshot) => {
+            const teacherRef = ref(db, 'teachers/' + user);
+            onValue(teacherRef, (snapshot) => {
                 const teacherData = snapshot.val();
                 if (teacherData) {
                     currentUserName = teacherData.name;
@@ -241,9 +235,10 @@ function checkSession() {
                     clearSession();
                     loginScreen.style.display = 'flex';
                 }
-            });
+            }, { onlyOnce: true });
         } else if (role === 'student') {
-            db.ref('students/' + user).once('value', (snapshot) => {
+            const studentRef = ref(db, 'students/' + user);
+            onValue(studentRef, (snapshot) => {
                 const studentData = snapshot.val();
                 if (studentData) {
                     currentUserName = studentData.name;
@@ -253,7 +248,7 @@ function checkSession() {
                     clearSession();
                     loginScreen.style.display = 'flex';
                 }
-            });
+            }, { onlyOnce: true });
         }
         return true;
     }
@@ -281,14 +276,16 @@ function showApp() {
 // LOAD ALL DATA
 // ============================================================
 function loadAllData() {
-    db.ref('teachers').on('value', (snapshot) => {
+    const teachersRef = ref(db, 'teachers');
+    onValue(teachersRef, (snapshot) => {
         allTeachers = snapshot.val() || {};
         renderTeachers();
         renderTeachersTable();
         renderTeacherGrid();
     });
 
-    db.ref('students').on('value', (snapshot) => {
+    const studentsRef = ref(db, 'students');
+    onValue(studentsRef, (snapshot) => {
         allStudents = snapshot.val() || {};
         renderClassButtons();
         if (selectedClass) {
@@ -307,7 +304,8 @@ function loadAllData() {
         populateRoutineClassSelect();
     });
 
-    db.ref('routines').on('value', (snapshot) => {
+    const routinesRef = ref(db, 'routines');
+    onValue(routinesRef, (snapshot) => {
         allRoutines = snapshot.val() || {};
         renderTodayTomorrowRoutine();
         renderRoutineEditor();
@@ -315,301 +313,36 @@ function loadAllData() {
         renderStudentOwnRoutine();
     });
 
-    db.ref('feed').on('value', (snapshot) => {
+    const feedRef = ref(db, 'feed');
+    onValue(feedRef, (snapshot) => {
         feedData = snapshot.val() || {};
         renderSocialFeed();
     });
 
-    db.ref('feedback').on('value', (snapshot) => {
+    const feedbackRef = ref(db, 'feedback');
+    onValue(feedbackRef, (snapshot) => {
         feedbackData = snapshot.val() || {};
         renderFeedbackList();
         renderStudentFeedbackArea();
     });
 
-    db.ref('attendance').on('value', (snapshot) => {
+    const attendanceRef = ref(db, 'attendance');
+    onValue(attendanceRef, (snapshot) => {
         attendanceData = snapshot.val() || {};
         if (currentRole === 'student' && currentUserKey) {
             renderStudentAttendance();
         }
-        if (currentRole === 'teacher') {
+        if (currentRole === 'teacher' || currentRole === 'admin') {
             renderClassMonthlyCalendar();
         }
     });
 }
 
 // ============================================================
-// STUDENT OWN ROUTINE DISPLAY
+// RENDER FUNCTIONS
 // ============================================================
-function renderStudentOwnRoutine() {
-    const container = document.getElementById('studentRoutineDisplay');
-    const parentContainer = document.getElementById('studentOwnRoutine');
-    
-    if (!container || !parentContainer) return;
-    
-    if (currentRole !== 'student' || !currentUserKey || !allStudents[currentUserKey]) {
-        parentContainer.style.display = 'none';
-        return;
-    }
-    
-    const student = allStudents[currentUserKey];
-    const className = student.class;
-    const groupName = student.group || '';
-    
-    if (!className) {
-        parentContainer.style.display = 'none';
-        return;
-    }
-    
-    parentContainer.style.display = 'block';
-    
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const today = new Date();
-    const todayName = days[today.getDay()];
-    const banglaDays = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
-    const todayBangla = banglaDays[today.getDay()];
-    
-    let html = `<div style="margin-bottom:15px; display:flex; justify-content:space-between; flex-wrap:wrap; align-items:center;">
-        <div>
-            <p style="font-size:16px;"><strong>📚 ক্লাস:</strong> ${className === 'SSC Special' ? '<span class="ssc-special-badge">🎯 SSC Special</span>' : className} 
-            ${groupName ? '| <span class="student-group-tag ' + groupName.toLowerCase() + '">' + GROUP_ICONS[groupName] + ' ' + groupName + '</span>' : ''}</p>
-            <p style="font-size:14px; color:rgba(255,255,255,0.7);"><strong>📅 আজ:</strong> ${todayBangla} (${todayName})</p>
-        </div>
-        <div>
-            <span style="background:#ffd700; color:#191970; padding:5px 15px; border-radius:20px; font-size:12px; font-weight:600;">
-                <i class="fas fa-calendar-check"></i> আমার রুটিন
-            </span>
-        </div>
-    </div>`;
-    
-    let routineKey = className;
-    if (groupName && isGroupRequired(className)) {
-        routineKey = className + '_' + groupName;
-    }
-    
-    html += `<div class="table-responsive">
-        <table class="routine-table" style="min-width:auto;">
-            <thead>
-                <tr>
-                    <th style="width:40%;">দিন</th>
-                    <th style="width:60%;">বিষয়</th>
-                </tr>
-            </thead>
-            <tbody>`;
-    
-    let hasRoutine = false;
-    days.forEach((day, index) => {
-        let subject = '-';
-        if (allRoutines[day] && allRoutines[day][routineKey]) {
-            subject = allRoutines[day][routineKey];
-            hasRoutine = true;
-        }
-        const isToday = day === todayName;
-        const banglaDay = banglaDays[index];
-        html += `<tr style="${isToday ? 'background:rgba(255,215,0,0.1); font-weight:bold;' : ''}">
-            <td>${banglaDay} ${isToday ? ' 📌 (আজ)' : ''}</td>
-            <td>${subject}</td>
-        </tr>`;
-    });
-    
-    html += `</tbody></table></div>`;
-    
-    if (!hasRoutine) {
-        html += `<div style="text-align:center; padding:30px 0; color:rgba(255,255,255,0.5);">
-            <i class="fas fa-calendar-times" style="font-size:40px; display:block; margin-bottom:10px; color:rgba(255,255,255,0.2);"></i>
-            <p>আপনার জন্য এখনো কোনো রুটিন যোগ করা হয়নি।</p>
-            <p style="font-size:12px;">অফিসে যোগাযোগ করুন রুটিন পেতে।</p>
-        </div>`;
-    } else {
-        const todaySubject = allRoutines[todayName] && allRoutines[todayName][routineKey] ? allRoutines[todayName][routineKey] : null;
-        if (todaySubject && todaySubject !== '-') {
-            html += `<div style="margin-top:15px; padding:12px 18px; background:linear-gradient(135deg, #ffd700, #f5a623); border-radius:15px; color:#191970; text-align:center; font-weight:600;">
-                <i class="fas fa-bell"></i> <strong>আজকের বিষয়:</strong> ${todaySubject}
-            </div>`;
-        }
-    }
-    
-    container.innerHTML = html;
-}
 
-// ============================================================
-// POPULATE SELECTS
-// ============================================================
-function populateAttendanceClassSelect() {
-    const classSelect = document.getElementById('attendanceClassSelect');
-    if (!classSelect) return;
-    
-    const selectedValue = classSelect.value;
-    classSelect.innerHTML = '';
-    allClasses.forEach(cls => {
-        const option = document.createElement('option');
-        option.value = cls;
-        option.textContent = cls;
-        classSelect.appendChild(option);
-    });
-    if (selectedValue && allClasses.includes(selectedValue)) {
-        classSelect.value = selectedValue;
-    }
-}
-
-function populateRoutineClassSelect() {
-    const classSelect = document.getElementById('routineClassSelect');
-    if (!classSelect) return;
-    
-    const selectedValue = classSelect.value;
-    classSelect.innerHTML = '';
-    allClasses.forEach(cls => {
-        const option = document.createElement('option');
-        option.value = cls;
-        option.textContent = cls;
-        classSelect.appendChild(option);
-    });
-    if (selectedValue && allClasses.includes(selectedValue)) {
-        classSelect.value = selectedValue;
-    }
-    
-    selectedRoutineClass = classSelect.value;
-}
-
-// ============================================================
-// UI SETUP FUNCTIONS
-// ============================================================
-function setupAdminUI() {
-    document.getElementById('menuClassManager').style.display = 'block';
-    document.getElementById('menuTeachers').style.display = 'block';
-    document.getElementById('menuFeedback').style.display = 'block';
-    document.getElementById('menuRoutineManager').style.display = 'block';
-    document.getElementById('menuStudentFeedback').style.display = 'none';
-    showPanel('dashboardPanel');
-    populateClassCheckboxes();
-    populateFeedbackClassFilter();
-    populateAttendanceClassSelect();
-    populateRoutineClassSelect();
-    setupAttendance();
-    toggleGroupField(null);
-}
-
-function setupTeacherUI(teacherData) {
-    document.getElementById('menuClassManager').style.display = 'none';
-    document.getElementById('menuTeachers').style.display = 'none';
-    document.getElementById('menuFeedback').style.display = 'none';
-    document.getElementById('menuRoutineManager').style.display = 'none';
-    document.getElementById('menuStudentFeedback').style.display = 'none';
-    showPanel('dashboardPanel');
-    renderTeacherProfile(teacherData);
-    renderTeacherAssignedClasses(teacherData);
-    populateAttendanceClassSelect();
-    setupAttendance();
-}
-
-function setupStudentUI(studentData) {
-    document.getElementById('menuClassManager').style.display = 'none';
-    document.getElementById('menuTeachers').style.display = 'none';
-    document.getElementById('menuFeedback').style.display = 'none';
-    document.getElementById('menuRoutineManager').style.display = 'none';
-    document.getElementById('menuStudentFeedback').style.display = 'block';
-    showPanel('dashboardPanel');
-    renderStudentInfo(studentData);
-    setupAttendance();
-}
-
-// ============================================================
-// PANEL NAVIGATION
-// ============================================================
-function showPanel(panelId) {
-    document.querySelectorAll('.panel').forEach(p => {
-        p.classList.remove('active-panel', 'active');
-        p.style.display = 'none';
-    });
-    const panel = document.getElementById(panelId);
-    if (panel) {
-        panel.classList.add('active-panel');
-        panel.style.display = 'block';
-    }
-}
-
-// Menu navigation
-document.getElementById('menuDashboard').addEventListener('click', () => {
-    showPanel('dashboardPanel');
-    dropdownMenu.classList.remove('show');
-});
-
-document.getElementById('menuClassManager').addEventListener('click', () => {
-    showPanel('adminClassPanel');
-    dropdownMenu.classList.remove('show');
-});
-
-document.getElementById('menuTeachers').addEventListener('click', () => {
-    showPanel('adminTeachersPanel');
-    dropdownMenu.classList.remove('show');
-});
-
-document.getElementById('menuAttendance').addEventListener('click', () => {
-    showPanel('attendancePanel');
-    dropdownMenu.classList.remove('show');
-    populateAttendanceClassSelect();
-    setupAttendance();
-});
-
-document.getElementById('menuFeedback').addEventListener('click', () => {
-    showPanel('adminFeedbackPanel');
-    dropdownMenu.classList.remove('show');
-});
-
-document.getElementById('menuRoutineManager').addEventListener('click', () => {
-    showPanel('adminRoutinePanel');
-    dropdownMenu.classList.remove('show');
-    populateRoutineClassSelect();
-    renderRoutineEditor();
-});
-
-document.getElementById('menuSocialFeed').addEventListener('click', () => {
-    showPanel('socialFeedPanel');
-    dropdownMenu.classList.remove('show');
-});
-
-document.getElementById('menuStudentFeedback').addEventListener('click', () => {
-    showPanel('studentPanel');
-    dropdownMenu.classList.remove('show');
-});
-
-document.getElementById('menuLogout').addEventListener('click', () => {
-    if (confirm('আপনি কি লগআউট করতে চান?')) {
-        clearSession();
-        location.reload();
-    }
-    dropdownMenu.classList.remove('show');
-});
-
-menuToggle.addEventListener('click', () => {
-    dropdownMenu.classList.toggle('show');
-});
-
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('.dropdown')) {
-        dropdownMenu.classList.remove('show');
-    }
-});
-
-// ============================================================
-// ROUTINE SELECT CHANGE
-// ============================================================
-document.getElementById('routineClassSelect')?.addEventListener('change', function() {
-    selectedRoutineClass = this.value;
-    renderRoutineEditor();
-});
-
-document.getElementById('routineDaySelect')?.addEventListener('change', function() {
-    selectedRoutineDay = this.value;
-    renderRoutineEditor();
-});
-
-document.getElementById('routineGroupSelect')?.addEventListener('change', function() {
-    renderRoutineEditor();
-});
-
-// ============================================================
-// TEACHER RENDERING
-// ============================================================
+// --- Teachers ---
 function renderTeachers() {
     const grid = document.getElementById('teachersGrid');
     if (!grid) return;
@@ -636,10 +369,10 @@ function renderTeachersTable() {
     const container = document.getElementById('teachersTable');
     if (!container) return;
     if (Object.keys(allTeachers).length === 0) {
-        container.innerHTML = '<p style="color:rgba(255,255,255,0.5); text-align:center;">কোনো শিক্ষক নেই</p>';
+        container.innerHTML = '<p class="empty-state">কোনো শিক্ষক নেই</p>';
         return;
     }
-    let html = `<table><thead><tr><th>ছবি</th><th>নাম</th><th>আইডি</th><th>ক্লাস</th><th>অ্যাকশন</th></tr></thead><tbody>`;
+    let html = `<div class="table-responsive"><table><thead><tr><th>ছবি</th><th>নাম</th><th>আইডি</th><th>ক্লাস</th><th>অ্যাকশন</th></tr></thead><tbody>`;
     for (let key in allTeachers) {
         const t = allTeachers[key];
         html += `<tr>
@@ -650,23 +383,21 @@ function renderTeachersTable() {
             <td><button class="btn btn-red btn-sm" onclick="deleteTeacher('${key}')">মুছুন</button></td>
         </tr>`;
     }
-    html += '</tbody></table>';
+    html += '</tbody></table></div>';
     container.innerHTML = html;
 }
 
-function deleteTeacher(key) {
+window.deleteTeacher = function(key) {
     if (confirm('শিক্ষককে মুছতে চান?')) {
-        db.ref('teachers/' + key).remove();
+        remove(ref(db, 'teachers/' + key));
     }
-}
+};
 
-// ============================================================
-// STUDENT RENDERING
-// ============================================================
+// --- Students ---
 function renderClassButtons() {
     const container = document.getElementById('classButtons');
     if (!container) return;
-    container.innerHTML = '';
+    container.innerHTML = '<div class="class-buttons-container">';
     allClasses.forEach(cls => {
         const btn = document.createElement('button');
         btn.className = 'class-btn' + (selectedClass === cls ? ' active' : '');
@@ -680,6 +411,7 @@ function renderClassButtons() {
         };
         container.appendChild(btn);
     });
+    container.innerHTML += '</div>';
 }
 
 function renderClassStudents(className) {
@@ -692,22 +424,19 @@ function renderClassStudents(className) {
         }
     }
     if (Object.keys(students).length === 0) {
-        container.innerHTML = '<p style="color:rgba(255,255,255,0.5); text-align:center;">এই ক্লাসে কোনো ছাত্র/ছাত্রী নেই</p>';
+        container.innerHTML = '<p class="empty-state">এই ক্লাসে কোনো ছাত্র/ছাত্রী নেই</p>';
         return;
     }
-    let html = `<table><thead><tr><th>ছবি</th><th>নাম</th><th>আইডি</th><th>ক্লাস</th><th>গ্রুপ</th><th>অভিভাবকের মোবাইল</th><th>অ্যাকশন</th></tr></thead><tbody>`;
+    let html = `<div class="table-responsive"><table><thead><tr><th>ছবি</th><th>নাম</th><th>আইডি</th><th>ক্লাস</th><th>গ্রুপ</th><th>অভিভাবকের মোবাইল</th><th>অ্যাকশন</th></tr></thead><tbody>`;
     for (let key in students) {
         const s = students[key];
         let groupBadge = '-';
-        
-        // SSC Special এর জন্য আলাদা ব্যাজ
         if (s.class === 'SSC Special') {
             groupBadge = `<span class="ssc-special-badge">🎯 এসএসসি স্পেশাল</span>`;
         } else if (s.group) {
             const icon = GROUP_ICONS[s.group] || '';
             groupBadge = `<span class="student-group-tag ${s.group.toLowerCase()}">${icon} ${s.group}</span>`;
         }
-        
         html += `<tr>
             <td><img src="${s.image || 'https://ui-avatars.com/api/?background=0a3b2e&color=fff&name=' + encodeURIComponent(s.name)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;"></td>
             <td>${s.name}</td>
@@ -718,19 +447,17 @@ function renderClassStudents(className) {
             <td><button class="btn btn-red btn-sm" onclick="deleteStudent('${key}')">মুছুন</button></td>
         </tr>`;
     }
-    html += '</tbody></table>';
+    html += '</tbody></table></div>';
     container.innerHTML = html;
 }
 
-function deleteStudent(key) {
+window.deleteStudent = function(key) {
     if (confirm('ছাত্র/ছাত্রীকে মুছতে চান?')) {
-        db.ref('students/' + key).remove();
+        remove(ref(db, 'students/' + key));
     }
-}
+};
 
-// ============================================================
-// ADD STUDENT
-// ============================================================
+// --- Add Student ---
 document.getElementById('addCousinBtn').addEventListener('click', () => {
     const name = document.getElementById('cousinName').value.trim();
     const id = document.getElementById('cousinId').value.trim();
@@ -765,8 +492,8 @@ document.getElementById('addCousinBtn').addEventListener('click', () => {
         image: document.getElementById('studentImagePreview').src
     };
     
-    const ref = db.ref('students').push();
-    ref.set(newStudent).then(() => {
+    const refPath = ref(db, 'students');
+    push(refPath, newStudent).then(() => {
         document.getElementById('cousinName').value = '';
         document.getElementById('cousinId').value = '';
         document.getElementById('cousinPass').value = '';
@@ -789,9 +516,7 @@ document.getElementById('studentImageInput').addEventListener('change', function
     }
 });
 
-// ============================================================
-// ADD TEACHER
-// ============================================================
+// --- Add Teacher ---
 function populateClassCheckboxes() {
     const container = document.getElementById('classCheckboxes');
     if (!container) return;
@@ -825,8 +550,8 @@ document.getElementById('createTeacherBtn').addEventListener('click', () => {
         classes: classes,
         image: document.getElementById('teacherImagePreview').src
     };
-    const ref = db.ref('teachers').push();
-    ref.set(newTeacher).then(() => {
+    const refPath = ref(db, 'teachers');
+    push(refPath, newTeacher).then(() => {
         document.getElementById('newTeacherName').value = '';
         document.getElementById('newTeacherId').value = '';
         document.getElementById('newTeacherPass').value = '';
@@ -848,9 +573,7 @@ document.getElementById('teacherImageInput').addEventListener('change', function
     }
 });
 
-// ============================================================
-// ROUTINE FUNCTIONS
-// ============================================================
+// --- Routine ---
 function renderTodayTomorrowRoutine() {
     const container = document.getElementById('todayTomorrowRoutine');
     if (!container) return;
@@ -1010,6 +733,7 @@ function renderRoutineEditor() {
     html += `</tbody></table></div></div>`;
     container.innerHTML = html;
     
+    // Event listeners for auto-save
     document.querySelectorAll('.routine-group-input').forEach(input => {
         input.addEventListener('input', function() {
             const className = this.dataset.class;
@@ -1022,7 +746,7 @@ function renderRoutineEditor() {
             if (!updatedRoutines[dayName]) updatedRoutines[dayName] = {};
             updatedRoutines[dayName][key] = value;
             
-            db.ref('routines').set(updatedRoutines);
+            set(ref(db, 'routines'), updatedRoutines);
         });
     });
     
@@ -1042,7 +766,7 @@ function renderRoutineEditor() {
             if (!updatedRoutines[dayName]) updatedRoutines[dayName] = {};
             updatedRoutines[dayName][className] = value;
             
-            db.ref('routines').set(updatedRoutines);
+            set(ref(db, 'routines'), updatedRoutines);
         });
     }
 }
@@ -1055,7 +779,7 @@ function renderRoutineModal() {
     const today = new Date();
     const todayName = days[today.getDay()];
     
-    let html = `<table class="routine-table"><thead><tr><th>ক্লাস</th><th>গ্রুপ</th>`;
+    let html = `<div class="table-responsive"><table class="routine-table"><thead><tr><th>ক্লাস</th><th>গ্রুপ</th>`;
     days.forEach(day => {
         html += `<th>${day}</th>`;
     });
@@ -1085,7 +809,7 @@ function renderRoutineModal() {
         }
     });
     
-    html += '</tbody></table>';
+    html += '</tbody></table></div>';
     container.innerHTML = html;
 }
 
@@ -1093,9 +817,346 @@ document.getElementById('saveAllRoutinesBtn').addEventListener('click', () => {
     alert('✅ সব রুটিন ইতিমধ্যে অটো-সেভ হয়েছে');
 });
 
-// ============================================================
-// ATTENDANCE SYSTEM
-// ============================================================
+// --- Routine Select Changes ---
+document.getElementById('routineClassSelect')?.addEventListener('change', function() {
+    selectedRoutineClass = this.value;
+    renderRoutineEditor();
+});
+
+document.getElementById('routineDaySelect')?.addEventListener('change', function() {
+    selectedRoutineDay = this.value;
+    renderRoutineEditor();
+});
+
+document.getElementById('routineGroupSelect')?.addEventListener('change', function() {
+    renderRoutineEditor();
+});
+
+// --- Student Own Routine ---
+function renderStudentOwnRoutine() {
+    const container = document.getElementById('studentRoutineDisplay');
+    const parentContainer = document.getElementById('studentOwnRoutine');
+    
+    if (!container || !parentContainer) return;
+    
+    if (currentRole !== 'student' || !currentUserKey || !allStudents[currentUserKey]) {
+        parentContainer.style.display = 'none';
+        return;
+    }
+    
+    const student = allStudents[currentUserKey];
+    const className = student.class;
+    const groupName = student.group || '';
+    
+    if (!className) {
+        parentContainer.style.display = 'none';
+        return;
+    }
+    
+    parentContainer.style.display = 'block';
+    
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const today = new Date();
+    const todayName = days[today.getDay()];
+    const banglaDays = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
+    const todayBangla = banglaDays[today.getDay()];
+    
+    let html = `<div style="margin-bottom:15px; display:flex; justify-content:space-between; flex-wrap:wrap; align-items:center;">
+        <div>
+            <p style="font-size:16px;"><strong>📚 ক্লাস:</strong> ${className === 'SSC Special' ? '<span class="ssc-special-badge">🎯 SSC Special</span>' : className} 
+            ${groupName ? '| <span class="student-group-tag ' + groupName.toLowerCase() + '">' + GROUP_ICONS[groupName] + ' ' + groupName + '</span>' : ''}</p>
+            <p style="font-size:14px; color:rgba(255,255,255,0.7);"><strong>📅 আজ:</strong> ${todayBangla} (${todayName})</p>
+        </div>
+        <div>
+            <span style="background:#ffd700; color:#191970; padding:5px 15px; border-radius:20px; font-size:12px; font-weight:600;">
+                <i class="fas fa-calendar-check"></i> আমার রুটিন
+            </span>
+        </div>
+    </div>`;
+    
+    let routineKey = className;
+    if (groupName && isGroupRequired(className)) {
+        routineKey = className + '_' + groupName;
+    }
+    
+    html += `<div class="table-responsive">
+        <table class="routine-table" style="min-width:auto;">
+            <thead>
+                <tr>
+                    <th style="width:40%;">দিন</th>
+                    <th style="width:60%;">বিষয়</th>
+                </tr>
+            </thead>
+            <tbody>`;
+    
+    let hasRoutine = false;
+    days.forEach((day, index) => {
+        let subject = '-';
+        if (allRoutines[day] && allRoutines[day][routineKey]) {
+            subject = allRoutines[day][routineKey];
+            hasRoutine = true;
+        }
+        const isToday = day === todayName;
+        const banglaDay = banglaDays[index];
+        html += `<tr style="${isToday ? 'background:rgba(255,215,0,0.1); font-weight:bold;' : ''}">
+            <td>${banglaDay} ${isToday ? ' 📌 (আজ)' : ''}</td>
+            <td>${subject}</td>
+        </tr>`;
+    });
+    
+    html += `</tbody></table></div>`;
+    
+    if (!hasRoutine) {
+        html += `<div style="text-align:center; padding:30px 0; color:rgba(255,255,255,0.5);">
+            <i class="fas fa-calendar-times" style="font-size:40px; display:block; margin-bottom:10px; color:rgba(255,255,255,0.2);"></i>
+            <p>আপনার জন্য এখনো কোনো রুটিন যোগ করা হয়নি।</p>
+            <p style="font-size:12px;">অফিসে যোগাযোগ করুন রুটিন পেতে।</p>
+        </div>`;
+    } else {
+        const todaySubject = allRoutines[todayName] && allRoutines[todayName][routineKey] ? allRoutines[todayName][routineKey] : null;
+        if (todaySubject && todaySubject !== '-') {
+            html += `<div style="margin-top:15px; padding:12px 18px; background:linear-gradient(135deg, #ffd700, #f5a623); border-radius:15px; color:#191970; text-align:center; font-weight:600;">
+                <i class="fas fa-bell"></i> <strong>আজকের বিষয়:</strong> ${todaySubject}
+            </div>`;
+        }
+    }
+    
+    container.innerHTML = html;
+}
+
+// --- Populate Selects ---
+function populateAttendanceClassSelect() {
+    const classSelect = document.getElementById('attendanceClassSelect');
+    if (!classSelect) return;
+    
+    const selectedValue = classSelect.value;
+    classSelect.innerHTML = '';
+    allClasses.forEach(cls => {
+        const option = document.createElement('option');
+        option.value = cls;
+        option.textContent = cls;
+        classSelect.appendChild(option);
+    });
+    if (selectedValue && allClasses.includes(selectedValue)) {
+        classSelect.value = selectedValue;
+    }
+}
+
+function populateRoutineClassSelect() {
+    const classSelect = document.getElementById('routineClassSelect');
+    if (!classSelect) return;
+    
+    const selectedValue = classSelect.value;
+    classSelect.innerHTML = '';
+    allClasses.forEach(cls => {
+        const option = document.createElement('option');
+        option.value = cls;
+        option.textContent = cls;
+        classSelect.appendChild(option);
+    });
+    if (selectedValue && allClasses.includes(selectedValue)) {
+        classSelect.value = selectedValue;
+    }
+    
+    selectedRoutineClass = classSelect.value;
+}
+
+// --- UI Setup ---
+function setupAdminUI() {
+    document.getElementById('menuClassManager').style.display = 'block';
+    document.getElementById('menuTeachers').style.display = 'block';
+    document.getElementById('menuFeedback').style.display = 'block';
+    document.getElementById('menuRoutineManager').style.display = 'block';
+    document.getElementById('menuStudentFeedback').style.display = 'none';
+    showPanel('dashboardPanel');
+    populateClassCheckboxes();
+    populateFeedbackClassFilter();
+    populateAttendanceClassSelect();
+    populateRoutineClassSelect();
+    setupAttendance();
+    toggleGroupField(null);
+}
+
+function setupTeacherUI(teacherData) {
+    document.getElementById('menuClassManager').style.display = 'none';
+    document.getElementById('menuTeachers').style.display = 'none';
+    document.getElementById('menuFeedback').style.display = 'none';
+    document.getElementById('menuRoutineManager').style.display = 'none';
+    document.getElementById('menuStudentFeedback').style.display = 'none';
+    showPanel('dashboardPanel');
+    renderTeacherProfile(teacherData);
+    renderTeacherAssignedClasses(teacherData);
+    populateAttendanceClassSelect();
+    setupAttendance();
+}
+
+function setupStudentUI(studentData) {
+    document.getElementById('menuClassManager').style.display = 'none';
+    document.getElementById('menuTeachers').style.display = 'none';
+    document.getElementById('menuFeedback').style.display = 'none';
+    document.getElementById('menuRoutineManager').style.display = 'none';
+    document.getElementById('menuStudentFeedback').style.display = 'block';
+    showPanel('dashboardPanel');
+    renderStudentInfo(studentData);
+    setupAttendance();
+}
+
+// --- Panel Navigation ---
+function showPanel(panelId) {
+    document.querySelectorAll('.panel').forEach(p => {
+        p.classList.remove('active-panel', 'active');
+        p.style.display = 'none';
+    });
+    const panel = document.getElementById(panelId);
+    if (panel) {
+        panel.classList.add('active-panel');
+        panel.style.display = 'block';
+    }
+}
+
+document.getElementById('menuDashboard').addEventListener('click', () => {
+    showPanel('dashboardPanel');
+    dropdownMenu.classList.remove('show');
+});
+
+document.getElementById('menuClassManager').addEventListener('click', () => {
+    showPanel('adminClassPanel');
+    dropdownMenu.classList.remove('show');
+});
+
+document.getElementById('menuTeachers').addEventListener('click', () => {
+    showPanel('adminTeachersPanel');
+    dropdownMenu.classList.remove('show');
+});
+
+document.getElementById('menuAttendance').addEventListener('click', () => {
+    showPanel('attendancePanel');
+    dropdownMenu.classList.remove('show');
+    populateAttendanceClassSelect();
+    setupAttendance();
+});
+
+document.getElementById('menuFeedback').addEventListener('click', () => {
+    showPanel('adminFeedbackPanel');
+    dropdownMenu.classList.remove('show');
+});
+
+document.getElementById('menuRoutineManager').addEventListener('click', () => {
+    showPanel('adminRoutinePanel');
+    dropdownMenu.classList.remove('show');
+    populateRoutineClassSelect();
+    renderRoutineEditor();
+});
+
+document.getElementById('menuSocialFeed').addEventListener('click', () => {
+    showPanel('socialFeedPanel');
+    dropdownMenu.classList.remove('show');
+});
+
+document.getElementById('menuStudentFeedback').addEventListener('click', () => {
+    showPanel('studentPanel');
+    dropdownMenu.classList.remove('show');
+});
+
+document.getElementById('menuLogout').addEventListener('click', () => {
+    if (confirm('আপনি কি লগআউট করতে চান?')) {
+        clearSession();
+        location.reload();
+    }
+    dropdownMenu.classList.remove('show');
+});
+
+menuToggle.addEventListener('click', () => {
+    dropdownMenu.classList.toggle('show');
+});
+
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.dropdown')) {
+        dropdownMenu.classList.remove('show');
+    }
+});
+
+// --- Teacher Profile ---
+function renderTeacherProfile(teacherData) {
+    const container = document.getElementById('teacherProfileArea');
+    if (!container) return;
+    container.innerHTML = `
+        <div style="display:flex; align-items:center; gap:20px; background:rgba(255,255,255,0.05); padding:20px; border-radius:20px;">
+            <img src="${teacherData.image || 'https://ui-avatars.com/api/?background=1e7b4a&color=fff&name=' + encodeURIComponent(teacherData.name)}" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid #ffd700;">
+            <div>
+                <h3 style="border:none; padding:0; color:white;">${teacherData.name}</h3>
+                <p style="color:rgba(255,255,255,0.8);"><strong>আইডি:</strong> ${teacherData.id}</p>
+                <p style="color:rgba(255,255,255,0.8);"><strong>ক্লাস:</strong> ${teacherData.classes ? teacherData.classes.join(', ') : ''}</p>
+            </div>
+        </div>
+    `;
+}
+
+function renderTeacherAssignedClasses(teacherData) {
+    const container = document.getElementById('teacherAssignedClasses');
+    if (!container) return;
+    const assignedClasses = teacherData.classes || [];
+    if (assignedClasses.length === 0) {
+        container.innerHTML = '<p style="color:rgba(255,255,255,0.5);">আপনার কোনো ক্লাস নেই</p>';
+        return;
+    }
+    let html = '<h3 style="color:white;">আপনার ক্লাসসমূহ</h3><div style="display:flex; flex-wrap:wrap; gap:10px;">';
+    assignedClasses.forEach(cls => {
+        const displayClass = cls === 'SSC Special' ? '🎯 SSC Special' : cls;
+        html += `<span style="background:#ffd700; color:#191970; padding:8px 16px; border-radius:30px; font-weight:bold;">${displayClass}</span>`;
+    });
+    html += '</div>';
+    container.innerHTML = html;
+    if (assignedClasses.length > 0) {
+        renderTeacherClassStudents(assignedClasses[0]);
+    }
+}
+
+function renderTeacherClassStudents(className) {
+    const container = document.getElementById('teacherClassStudents');
+    if (!container) return;
+    const students = {};
+    for (let key in allStudents) {
+        if (allStudents[key].class === className) {
+            students[key] = allStudents[key];
+        }
+    }
+    if (Object.keys(students).length === 0) {
+        container.innerHTML = `<p style="color:rgba(255,255,255,0.5);">${className} ক্লাসে কোনো ছাত্র/ছাত্রী নেই</p>`;
+        return;
+    }
+    let html = `<h3 style="color:white;">${className === 'SSC Special' ? '🎯 SSC Special' : className} ক্লাসের ছাত্র/ছাত্রী</h3><div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:10px;">`;
+    for (let key in students) {
+        const s = students[key];
+        const icon = GROUP_ICONS[s.group] || '';
+        const groupClass = s.group ? s.group.toLowerCase() : '';
+        html += `<div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:16px; text-align:center;">
+            <img src="${s.image || 'https://ui-avatars.com/api/?background=0a3b2e&color=fff&name=' + encodeURIComponent(s.name)}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid #ffd700;">
+            <p style="margin-top:5px; color:white;"><strong>${s.name}</strong></p>
+            <p style="font-size:12px; color:rgba(255,255,255,0.5);">${s.id}</p>
+            ${s.group ? `<p style="font-size:11px; margin-top:3px;"><span class="student-group-tag ${groupClass}">${icon} ${s.group}</span></p>` : ''}
+            ${s.class === 'SSC Special' ? `<p style="margin-top:3px;"><span class="ssc-special-badge">🎯 SSC Special</span></p>` : ''}
+        </div>`;
+    }
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+// --- Student Info ---
+function renderStudentInfo(studentData) {
+    const card = document.getElementById('studentClassInfo');
+    if (!card || !studentData) return;
+    card.style.display = 'block';
+    document.getElementById('studentNameDisplay').textContent = studentData.name;
+    document.getElementById('studentClassDisplay').textContent = studentData.class === 'SSC Special' ? '🎯 SSC Special' : studentData.class;
+    const icon = GROUP_ICONS[studentData.group] || '';
+    document.getElementById('studentGroupDisplay').textContent = studentData.group ? icon + ' ' + studentData.group : '-';
+    document.getElementById('studentIdDisplay').textContent = studentData.id;
+    
+    renderStudentOwnRoutine();
+}
+
+// --- Attendance ---
 function setupAttendance() {
     const dateInput = document.getElementById('attendanceDate');
     if (dateInput) {
@@ -1158,7 +1219,7 @@ function loadStudentAttendance(className, groupName, date) {
     }
     
     if (Object.keys(students).length === 0) {
-        container.innerHTML = '<p style="color:rgba(255,255,255,0.5);">এই ক্লাসে কোনো ছাত্র/ছাত্রী নেই</p>';
+        container.innerHTML = '<p class="empty-state">এই ক্লাসে কোনো ছাত্র/ছাত্রী নেই</p>';
         section.style.display = 'block';
         return;
     }
@@ -1201,7 +1262,7 @@ function saveAttendanceAutomatically() {
         const studentKey = cb.dataset.student;
         attData[studentKey] = cb.checked;
     });
-    db.ref('attendance/' + attKey).set(attData);
+    set(ref(db, 'attendance/' + attKey), attData);
 }
 
 document.getElementById('saveAttendanceBtn').addEventListener('click', () => {
@@ -1209,6 +1270,7 @@ document.getElementById('saveAttendanceBtn').addEventListener('click', () => {
     alert('✅ উপস্থিতি সংরক্ষণ করা হয়েছে');
 });
 
+// --- Student Attendance ---
 function renderStudentAttendance() {
     if (!currentUserKey || !allStudents[currentUserKey]) return;
     const student = allStudents[currentUserKey];
@@ -1281,11 +1343,12 @@ function renderStudentAttendance() {
     `;
 }
 
-function changeStudentMonth(delta) {
+window.changeStudentMonth = function(delta) {
     studentMonthOffset += delta;
     renderStudentAttendance();
-}
+};
 
+// --- Class Monthly Calendar ---
 function renderClassMonthlyCalendar() {
     const container = document.getElementById('classMonthlyCalendar');
     const monthSelector = document.getElementById('classMonthSelector');
@@ -1318,7 +1381,7 @@ function renderClassMonthlyCalendar() {
     }
     
     if (Object.keys(students).length === 0) {
-        container.innerHTML = '<p style="color:rgba(255,255,255,0.5);">এই ক্লাসে কোনো ছাত্র/ছাত্রী নেই</p>';
+        container.innerHTML = '<p class="empty-state">এই ক্লাসে কোনো ছাত্র/ছাত্রী নেই</p>';
         return;
     }
     
@@ -1375,103 +1438,17 @@ function renderClassMonthlyCalendar() {
     container.innerHTML = html;
 }
 
-function changeClassMonth(delta) {
+window.changeClassMonth = function(delta) {
     classMonthOffset += delta;
     renderClassMonthlyCalendar();
-}
+};
 
-// ============================================================
-// STUDENT INFO with Group
-// ============================================================
-function renderStudentInfo(studentData) {
-    const card = document.getElementById('studentClassInfo');
-    if (!card || !studentData) return;
-    card.style.display = 'block';
-    document.getElementById('studentNameDisplay').textContent = studentData.name;
-    document.getElementById('studentClassDisplay').textContent = studentData.class === 'SSC Special' ? '🎯 SSC Special' : studentData.class;
-    const icon = GROUP_ICONS[studentData.group] || '';
-    document.getElementById('studentGroupDisplay').textContent = studentData.group ? icon + ' ' + studentData.group : '-';
-    document.getElementById('studentIdDisplay').textContent = studentData.id;
-    
-    renderStudentOwnRoutine();
-}
-
-// ============================================================
-// TEACHER PROFILE
-// ============================================================
-function renderTeacherProfile(teacherData) {
-    const container = document.getElementById('teacherProfileArea');
-    if (!container) return;
-    container.innerHTML = `
-        <div style="display:flex; align-items:center; gap:20px; background:rgba(255,255,255,0.05); padding:20px; border-radius:20px;">
-            <img src="${teacherData.image || 'https://ui-avatars.com/api/?background=1e7b4a&color=fff&name=' + encodeURIComponent(teacherData.name)}" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid #ffd700;">
-            <div>
-                <h3 style="border:none; padding:0; color:white;">${teacherData.name}</h3>
-                <p style="color:rgba(255,255,255,0.8);"><strong>আইডি:</strong> ${teacherData.id}</p>
-                <p style="color:rgba(255,255,255,0.8);"><strong>ক্লাস:</strong> ${teacherData.classes ? teacherData.classes.join(', ') : ''}</p>
-            </div>
-        </div>
-    `;
-}
-
-function renderTeacherAssignedClasses(teacherData) {
-    const container = document.getElementById('teacherAssignedClasses');
-    if (!container) return;
-    const assignedClasses = teacherData.classes || [];
-    if (assignedClasses.length === 0) {
-        container.innerHTML = '<p style="color:rgba(255,255,255,0.5);">আপনার কোনো ক্লাস নেই</p>';
-        return;
-    }
-    let html = '<h3 style="color:white;">আপনার ক্লাসসমূহ</h3><div style="display:flex; flex-wrap:wrap; gap:10px;">';
-    assignedClasses.forEach(cls => {
-        const displayClass = cls === 'SSC Special' ? '🎯 SSC Special' : cls;
-        html += `<span style="background:#ffd700; color:#191970; padding:8px 16px; border-radius:30px; font-weight:bold;">${displayClass}</span>`;
-    });
-    html += '</div>';
-    container.innerHTML = html;
-    if (assignedClasses.length > 0) {
-        renderTeacherClassStudents(assignedClasses[0]);
-    }
-}
-
-function renderTeacherClassStudents(className) {
-    const container = document.getElementById('teacherClassStudents');
-    if (!container) return;
-    const students = {};
-    for (let key in allStudents) {
-        if (allStudents[key].class === className) {
-            students[key] = allStudents[key];
-        }
-    }
-    if (Object.keys(students).length === 0) {
-        container.innerHTML = `<p style="color:rgba(255,255,255,0.5);">${className} ক্লাসে কোনো ছাত্র/ছাত্রী নেই</p>`;
-        return;
-    }
-    let html = `<h3 style="color:white;">${className === 'SSC Special' ? '🎯 SSC Special' : className} ক্লাসের ছাত্র/ছাত্রী</h3><div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:10px;">`;
-    for (let key in students) {
-        const s = students[key];
-        const icon = GROUP_ICONS[s.group] || '';
-        const groupClass = s.group ? s.group.toLowerCase() : '';
-        html += `<div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:16px; text-align:center;">
-            <img src="${s.image || 'https://ui-avatars.com/api/?background=0a3b2e&color=fff&name=' + encodeURIComponent(s.name)}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid #ffd700;">
-            <p style="margin-top:5px; color:white;"><strong>${s.name}</strong></p>
-            <p style="font-size:12px; color:rgba(255,255,255,0.5);">${s.id}</p>
-            ${s.group ? `<p style="font-size:11px; margin-top:3px;"><span class="student-group-tag ${groupClass}">${icon} ${s.group}</span></p>` : ''}
-            ${s.class === 'SSC Special' ? `<p style="margin-top:3px;"><span class="ssc-special-badge">🎯 SSC Special</span></p>` : ''}
-        </div>`;
-    }
-    html += '</div>';
-    container.innerHTML = html;
-}
-
-// ============================================================
-// FEEDBACK SYSTEM
-// ============================================================
+// --- Feedback ---
 function renderStudentFeedbackArea() {
     const container = document.getElementById('studentFeedbackArea');
     if (!container) return;
     if (!currentUserKey || !allStudents[currentUserKey]) {
-        container.innerHTML = '<p style="color:rgba(255,255,255,0.5);">আপনি লগইন করেননি</p>';
+        container.innerHTML = '<p class="empty-state">আপনি লগইন করেননি</p>';
         return;
     }
     const student = allStudents[currentUserKey];
@@ -1508,12 +1485,12 @@ function renderMyFeedback() {
         }
     }
     if (!hasFeedback) {
-        html += '<p style="color:rgba(255,255,255,0.5);">আপনার কোনো মতামত নেই</p>';
+        html += '<p class="empty-state">আপনার কোনো মতামত নেই</p>';
     }
     container.innerHTML = html;
 }
 
-function submitFeedback() {
+window.submitFeedback = function() {
     const text = document.getElementById('feedbackText')?.value.trim();
     if (!text) {
         alert('মতামত লিখুন');
@@ -1529,20 +1506,20 @@ function submitFeedback() {
         text: text,
         date: new Date().toISOString().split('T')[0]
     };
-    db.ref('feedback').push(feedback).then(() => {
+    push(ref(db, 'feedback'), feedback).then(() => {
         const input = document.getElementById('feedbackText');
         if (input) input.value = '';
         alert('✅ মতামত পাঠানো হয়েছে');
     }).catch((error) => {
         alert('❌ পাঠাতে সমস্যা হয়েছে: ' + error.message);
     });
-}
+};
 
-function deleteFeedback(key) {
+window.deleteFeedback = function(key) {
     if (confirm('মতামত মুছতে চান?')) {
-        db.ref('feedback/' + key).remove();
+        remove(ref(db, 'feedback/' + key));
     }
-}
+};
 
 function populateFeedbackClassFilter() {
     const select = document.getElementById('feedbackClassFilter');
@@ -1578,14 +1555,12 @@ function renderFeedbackList() {
         </div>`;
     }
     if (count === 0) {
-        html = '<p style="color:rgba(255,255,255,0.5); text-align:center;">কোনো মতামত নেই</p>';
+        html = '<p class="empty-state">কোনো মতামত নেই</p>';
     }
     container.innerHTML = html;
 }
 
-// ============================================================
-// SOCIAL FEED
-// ============================================================
+// --- Social Feed ---
 document.getElementById('feedImageInput')?.addEventListener('change', function(e) {
     const files = e.target.files;
     const container = document.getElementById('imagePreviewContainer');
@@ -1631,8 +1606,7 @@ window.publishPost = function() {
         comments: {}
     };
     
-    const ref = db.ref('feed').push();
-    ref.set(post).then(() => {
+    push(ref(db, 'feed'), post).then(() => {
         const captionInput = document.getElementById('feedCaption');
         if (captionInput) captionInput.value = '';
         const previewContainer = document.getElementById('imagePreviewContainer');
@@ -1655,7 +1629,7 @@ function renderSocialFeed() {
     }
     posts.sort((a, b) => (b.data.timestamp || 0) - (a.data.timestamp || 0));
     if (posts.length === 0) {
-        container.innerHTML = '<p style="color:rgba(255,255,255,0.5); text-align:center;">কোনো পোস্ট নেই</p>';
+        container.innerHTML = '<p class="empty-state">কোনো পোস্ট নেই</p>';
         return;
     }
     let html = '';
@@ -1707,14 +1681,14 @@ function renderComments(comments) {
     return html;
 }
 
-function toggleComment(postKey) {
+window.toggleComment = function(postKey) {
     const section = document.getElementById(`comment-section-${postKey}`);
     if (section) {
         section.style.display = section.style.display === 'none' ? 'block' : 'none';
     }
-}
+};
 
-function addComment(postKey) {
+window.addComment = function(postKey) {
     const input = document.getElementById(`comment-input-${postKey}`);
     if (!input) return;
     const text = input.value.trim();
@@ -1733,22 +1707,22 @@ function addComment(postKey) {
         date: new Date().toISOString().split('T')[0],
         timestamp: Date.now()
     };
-    const ref = db.ref(`feed/${postKey}/comments`).push();
-    ref.set(comment).then(() => {
+    push(ref(db, `feed/${postKey}/comments`), comment).then(() => {
         input.value = '';
     }).catch((error) => {
         alert('❌ মন্তব্য করতে সমস্যা হয়েছে: ' + error.message);
     });
-}
+};
 
-function likePost(postKey) {
+window.likePost = function(postKey) {
     if (!currentUserKey) {
         alert('আপনি লগইন করেননি');
         return;
     }
-    const postRef = db.ref(`feed/${postKey}`);
-    postRef.transaction((currentData) => {
-        if (currentData === null) return currentData;
+    const postRef = ref(db, `feed/${postKey}`);
+    get(postRef).then((snapshot) => {
+        const currentData = snapshot.val();
+        if (!currentData) return;
         if (!currentData.likedBy) currentData.likedBy = {};
         if (!currentData.likes) currentData.likes = 0;
         if (currentData.likedBy[currentUserKey]) {
@@ -1758,19 +1732,17 @@ function likePost(postKey) {
             currentData.likedBy[currentUserKey] = true;
             currentData.likes++;
         }
-        return currentData;
+        set(postRef, currentData);
     });
-}
+};
 
-function deletePost(postKey) {
+window.deletePost = function(postKey) {
     if (confirm('পোস্ট মুছতে চান?')) {
-        db.ref('feed/' + postKey).remove();
+        remove(ref(db, 'feed/' + postKey));
     }
-}
+};
 
-// ============================================================
-// BUTTON EVENT LISTENERS
-// ============================================================
+// --- View Buttons ---
 document.getElementById('viewRoutineBtn')?.addEventListener('click', () => {
     document.getElementById('routineModal').style.display = 'flex';
     renderRoutineModal();
@@ -1799,6 +1771,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 console.log('📚 মাস্টারমাইন্ড অ্যাকাডেমি সিস্টেম লোড হয়েছে');
-console.log('✅ Firebase Connected');
+console.log('🔥 Firebase v9+ Connected');
 console.log('✅ অটো-সেভ সক্রিয় আছে');
 console.log('✅ SSC Special ক্লাস হিসেবে আছে (গ্রুপ নয়)');
