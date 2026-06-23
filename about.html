@@ -403,6 +403,7 @@
             border: none;
             cursor: pointer;
         }
+        /* Print styles: hide/show columns based on checkboxes */
         @media print {
             @page { size: A4 landscape; margin: 5mm 4mm; }
             body { background: white; padding: 0; margin: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -417,7 +418,9 @@
             }
             #resultTableWrap { display: block !important; overflow: visible !important; }
             #topHoldersBox { display: block !important; }
+            /* honor checkbox state for print */
             .cell-total, .cell-pct, .cell-gpa, .cell-res, .cell-pos { display: table-cell !important; }
+            /* but we will use JS to hide them based on checkbox state, so we override with !important via inline style in render */
             th, td { padding: 4px 3px !important; font-size: 9px !important; }
             .stu-name-input { font-size: 10px !important; padding: 3px !important; min-width: 180px !important; width: 180px !important; border: 1px solid #aaa !important; }
             .excel-header, .info-bar, th, .main-title-box, .footer { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -622,6 +625,11 @@
         </select>
         <select id="gSel" onchange="changeGroup()"><option value="Science">বিজ্ঞান</option><option value="Commerce">বাণিজ্য</option><option value="Arts">মানবিক</option></select>
         <select id="eSel" onchange="updateInfo()"></select>
+        <!-- exam name edit option -->
+        <div class="admin-only" style="display:inline-flex; gap:6px;">
+            <input type="text" id="examNameEdit" placeholder="New Exam Name" style="width:120px;">
+            <button class="btn-add" onclick="editExamName()"><i class="fas fa-edit"></i> Rename</button>
+        </div>
         <div class="copy-section admin-only">
             <select id="copyExamSelect"></select>
             <button class="btn-copy" onclick="copyStudentsFromExam()"><i class="fas fa-paste"></i> Student Copy</button>
@@ -653,7 +661,7 @@
 <div id="autoSaveToast" class="auto-save-toast">✅ স্বয়ংক্রিয়ভাবে সংরক্ষিত</div>
 
 <script>
-    // Updated Firebase configuration with the new project credentials
+    // Firebase configuration
     const firebaseConfig = {
         apiKey: "AIzaSyCWdtsJQ_A6BnJ8mX9Y3St5xPJA0NGve5s",
         authDomain: "g-result-16d63.firebaseapp.com",
@@ -664,7 +672,6 @@
         measurementId: "G-5N8B8CKRMN"
     };
 
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
@@ -737,6 +744,43 @@
             render();
             document.getElementById('loadingMsg').style.display='none';
         }).catch(()=>{ document.getElementById('loadingMsg').style.display='none'; alert("ডাটা লোড ব্যর্থ"); });
+    }
+
+    // ---- Exam Name Edit ----
+    function editExamName() {
+        if(!isAdmin) return;
+        let oldName = document.getElementById('eSel').value;
+        let newName = document.getElementById('examNameEdit').value.trim();
+        if(!oldName || !newName) return alert("পুরাতন ও নতুন নাম দিন");
+        if(oldName === newName) return alert("নাম একই");
+        let c = document.getElementById('cSel').value, g = document.getElementById('gSel').value;
+        let oldPath = `results/${c}_${g}_${oldName}`.replace(/\s+/g,'_');
+        let newPath = `results/${c}_${g}_${newName}`.replace(/\s+/g,'_');
+        // copy data to new path
+        db.ref(oldPath).once('value', snap=>{
+            let data = snap.val();
+            if(!data) return alert("পুরাতন পরীক্ষার ডাটা নেই");
+            db.ref(newPath).set(data).then(()=>{
+                // update exam list
+                db.ref(`exams_list_per_class/${c}_${g}`).once('value', snap2=>{
+                    let list = snap2.val()||[];
+                    let idx = list.indexOf(oldName);
+                    if(idx !== -1) list[idx] = newName;
+                    else list.push(newName);
+                    db.ref(`exams_list_per_class/${c}_${g}`).set(list).then(()=>{
+                        // remove old path
+                        db.ref(oldPath).remove().then(()=>{
+                            examsList = list;
+                            updateExamDropdowns();
+                            document.getElementById('eSel').value = newName;
+                            document.getElementById('examNameEdit').value = '';
+                            updateInfo();
+                            alert("পরীক্ষার নাম পরিবর্তন করা হয়েছে!");
+                        });
+                    });
+                });
+            });
+        });
     }
 
     function updateExamType(sub, type) { if(!isAdmin) return; subjectExamType[sub] = type; render(); autoSave(); }
@@ -864,12 +908,14 @@
         let r=document.getElementById('chkRes').checked;
         let s=document.getElementById('chkPos').checked;
 
+        // header
         document.querySelectorAll('#hRow th.cell-total').forEach(el => el.style.display = t ? '' : 'none');
         document.querySelectorAll('#hRow th.cell-pct').forEach(el => el.style.display = p ? '' : 'none');
         document.querySelectorAll('#hRow th.cell-gpa').forEach(el => el.style.display = g ? '' : 'none');
         document.querySelectorAll('#hRow th.cell-res').forEach(el => el.style.display = r ? '' : 'none');
         document.querySelectorAll('#hRow th.cell-pos').forEach(el => el.style.display = s ? '' : 'none');
 
+        // body
         document.querySelectorAll('#tBody td.cell-total, #tBody td.r-total').forEach(el => el.style.display = t ? '' : 'none');
         document.querySelectorAll('#tBody td.cell-pct, #tBody td.r-pct').forEach(el => el.style.display = p ? '' : 'none');
         document.querySelectorAll('#tBody td.cell-gpa, #tBody td.r-gpa').forEach(el => el.style.display = g ? '' : 'none');
