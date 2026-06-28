@@ -1,7 +1,49 @@
 // ============================================================
-// GLOBAL VARIABLES (FIXED)
+// FIREBASE CONFIGURATION (CDN Version - Compatible)
 // ============================================================
+
+// Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyAe_LzZAKonCZ5IOakXyqGeErTU0RGTYr4",
+    authDomain: "g-main-option.firebaseapp.com",
+    projectId: "g-main-option",
+    storageBucket: "g-main-option.firebasestorage.app",
+    messagingSenderId: "82515375288",
+    appId: "1:82515375288:web:12bfb9803af5e9bbbe704d",
+    measurementId: "G-EVNFKCMFNZ"
+};
+
+// Initialize Firebase (CDN version)
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// ============================================================
+// EXPOSE TO GLOBAL SCOPE
+// ============================================================
+window.db = db;
+window.firebase = firebase;
+
+// ============================================================
+// GLOBAL VARIABLES
+// ============================================================
+let currentUserKey = null;
+let currentUserName = null;
+let currentRole = null;
+let selectedClass = null;
+let currentAttendanceDate = null;
+let attendanceData = {};
+let allStudents = {};
+let allTeachers = {};
+let allRoutines = {};
 let allClasses = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'SSC Special'];
+let feedData = {};
+let feedbackData = {};
+let studentMonthOffset = 0;
+let classMonthOffset = 0;
+let feedImages = [];
+let selectedRoutineClass = null;
+let selectedRoutineDay = 'Sunday';
+// ============================================================
 
 const GROUP_LIST = ['Science', 'Commerce', 'Arts'];
 const GROUP_ICONS = {
