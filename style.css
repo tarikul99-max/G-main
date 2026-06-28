@@ -387,13 +387,13 @@ body {
 }
 
 #dashboardPanel .btn-green {
-    background: rgba(255, 215, 0, 0.15) !important;
+    background: rgba(46, 204, 113, 0.2) !important;
     color: white !important;
-    border: 1px solid rgba(255, 215, 0, 0.2) !important;
+    border: 1px solid rgba(46, 204, 113, 0.3) !important;
 }
 
 #dashboardPanel .btn-green:hover {
-    background: rgba(255, 215, 0, 0.25) !important;
+    background: rgba(46, 204, 113, 0.35) !important;
 }
 
 #dashboardPanel .btn-orange {
@@ -536,12 +536,12 @@ body {
 }
 
 .btn-green { 
-    background: linear-gradient(135deg, #ffd700, #f5a623); 
-    color: #191970; 
+    background: linear-gradient(135deg, #2ecc71, #27ae60); 
+    color: white; 
 }
 
 .btn-green:hover {
-    background: linear-gradient(135deg, #ffe44d, #ffb347);
+    background: linear-gradient(135deg, #3ddc84, #2ecc71);
 }
 
 .btn-blue { 
@@ -815,15 +815,15 @@ select option {
 }
 
 .student-group-tag.science {
-    background: #1a0802;
+    background: #2ecc71;
 }
 
 .student-group-tag.commerce {
-    background: #1a0802;
+    background: #f39c12;
 }
 
 .student-group-tag.arts {
-    background: #1a0802;
+    background: #9b59b6;
 }
 
 /* ==================== SSC SPECIAL BADGE ==================== */
@@ -883,7 +883,7 @@ select option {
 }
 
 .delete-post-btn {
-    background: #1a0802;
+    background: #e74c3c;
     color: white;
     border: none;
     border-radius: 20px;
@@ -894,7 +894,7 @@ select option {
 }
 
 .delete-post-btn:hover {
-    background: #1a0802;
+    background: #c0392b;
 }
 
 /* ==================== ATTENDANCE ==================== */
@@ -936,9 +936,9 @@ select option {
 }
 
 .cal-day.present {
-    background: rgba(255, 215, 0, 0.2);
-    color: #ffd700;
-    border-color: rgba(255, 215, 0, 0.3);
+    background: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+    border-color: rgba(46, 204, 113, 0.3);
 }
 
 .cal-day.absent {
@@ -1353,7 +1353,7 @@ input:checked + .slider:before {
 }
 
 .delete-btn {
-    background: #1a0802;
+    background: #e74c3c;
     color: white;
     border: none;
     padding: 4px 10px;
@@ -1365,7 +1365,7 @@ input:checked + .slider:before {
 }
 
 .delete-btn:hover {
-    background: #1a0802;
+    background: #c0392b;
 }
 
 /* ==================== REACTIONS ==================== */
