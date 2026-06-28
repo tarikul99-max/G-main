@@ -119,16 +119,7 @@ function toggleGroupField(className) {
     if (!groupContainer || !groupSelect) return;
     
     // SSC Special এর জন্য গ্রুপ ফিল্ড সম্পূর্ণ লুকান
-    if (className === 'SSC Special') {
-        groupContainer.style.display = 'none';
-        groupSelect.required = false;
-        groupSelect.value = '';
-        if (requiredMsg) {
-            requiredMsg.textContent = '🎯 SSC Special ক্লাসের জন্য গ্রুপ প্রয়োজন নেই';
-            requiredMsg.style.color = '#ffd700';
-        }
-        return;
-    }
+    
     
     // অন্যান্য ক্লাসের জন্য দেখান
     groupContainer.style.display = 'block';
