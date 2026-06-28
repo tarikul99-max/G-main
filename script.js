@@ -50,7 +50,7 @@ const GROUP_ICONS = {
     'Commerce': '💼',
     'Arts': '⚖️'
 };
-const GROUP_REQUIRED_CLASSES = ['Nine', 'Ten']; // SSC Special বাদ দেওয়া হয়েছে
+const GROUP_REQUIRED_CLASSES = ['Nine', 'Ten','SSC Special']; // SSC Special বাদ দেওয়া হয়েছে
 
 // ============================================================
 // DOM REFS
