@@ -2,7 +2,6 @@
 // FIREBASE CONFIGURATION (CDN Version - Compatible)
 // ============================================================
 
-// Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyAe_LzZAKonCZ5IOakXyqGeErTU0RGTYr4",
     authDomain: "g-main-option.firebaseapp.com",
@@ -13,13 +12,9 @@ const firebaseConfig = {
     measurementId: "G-EVNFKCMFNZ"
 };
 
-// Initialize Firebase (CDN version)
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// ============================================================
-// EXPOSE TO GLOBAL SCOPE
-// ============================================================
 window.db = db;
 window.firebase = firebase;
 
@@ -1796,8 +1791,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-console.log('📚 মাস্টারমাইন্ড অ্যাকাডেমি সিস্টেম লোড হয়েছে');
+console.log('📚 GLORIOUS Education Care সিস্টেম লোড হয়েছে');
 console.log('🔥 Firebase Connected');
 console.log('✅ অটো-সেভ সক্রিয় আছে');
 console.log('✅ SSC Special ক্লাসের জন্য গ্রুপ বাধ্যতামূলক করা হয়েছে');
-console.log('✅ Nine, Ten, SSC Special - সব ক্লাসের জন্য গ্রুপ আবশ্যক');
