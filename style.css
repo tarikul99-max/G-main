@@ -45,33 +45,22 @@ body::before {
     }
 }
 
-/* Decorative elements - top left */
-body::after {
-    content: '✦';
+/* ==================== 3D CANVAS BACKGROUND ==================== */
+#canvas-container {
     position: fixed;
-    top: 20px;
-    left: 20px;
-    font-size: 40px;
-    color: rgba(255, 215, 0, 0.08);
-    z-index: 0;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
     pointer-events: none;
 }
 
-/* Additional decorative elements */
-.decoration {
-    position: fixed;
-    font-size: 24px;
-    color: rgba(255, 182, 193, 0.06);
-    z-index: 0;
-    pointer-events: none;
+#canvas-container canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
 }
-
-.decoration.d1 { top: 10%; right: 5%; }
-.decoration.d2 { bottom: 15%; left: 8%; }
-.decoration.d3 { bottom: 20%; right: 10%; }
-.decoration.d4 { top: 30%; left: 3%; }
-.decoration.d5 { top: 60%; right: 3%; }
-.decoration.d6 { bottom: 40%; left: 5%; }
 
 /* ==================== LOGIN SCREEN ==================== */
 .login-screen {
@@ -84,7 +73,7 @@ body::after {
     justify-content: center;
     align-items: center;
     z-index: 100;
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(26, 10, 46, 0.5));
+    background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(8px);
     padding: 16px;
 }
@@ -97,31 +86,11 @@ body::after {
     width: 100%;
     max-width: 400px;
     text-align: center;
-    box-shadow: 0 35px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 215, 0, 0.2), 0 0 40px rgba(255, 182, 193, 0.1);
+    box-shadow: 0 35px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 215, 0, 0.2);
     border: 1px solid rgba(255, 215, 0, 0.15);
     z-index: 2;
     position: relative;
     overflow: hidden;
-}
-
-.login-card::before {
-    content: '✦';
-    position: absolute;
-    top: -30px;
-    right: -10px;
-    font-size: 120px;
-    color: rgba(255, 215, 0, 0.05);
-    pointer-events: none;
-}
-
-.login-card::after {
-    content: '✦';
-    position: absolute;
-    bottom: -30px;
-    left: -10px;
-    font-size: 100px;
-    color: rgba(255, 182, 193, 0.04);
-    pointer-events: none;
 }
 
 .login-card h3 {
@@ -132,18 +101,6 @@ body::after {
     text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
     position: relative;
     z-index: 1;
-}
-
-.login-card h3 .icon {
-    color: #FFD700;
-    font-size: 1.4rem;
-    margin: 0 5px;
-}
-
-.login-card h3 .pink-icon {
-    color: #FFB6C1;
-    font-size: 1.4rem;
-    margin: 0 5px;
 }
 
 .login-card input,
@@ -170,7 +127,7 @@ body::after {
 .login-card select:focus {
     border-color: #FFD700;
     outline: none;
-    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.15), 0 0 20px rgba(255, 182, 193, 0.05);
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.15);
 }
 
 .login-card select option {
@@ -199,11 +156,6 @@ body::after {
     background: linear-gradient(135deg, #FFD700, #228B22, #006400);
     transform: scale(1.02);
     box-shadow: 0 6px 40px rgba(255, 215, 0, 0.4);
-}
-
-.login-card p {
-    position: relative;
-    z-index: 1;
 }
 
 /* ==================== APP CONTAINER ==================== */
@@ -246,23 +198,17 @@ body::after {
     flex: 1;
 }
 
-.logo-area .icon {
+.logo-area h1 {
+    font-size: 1.2rem;
+    font-weight: 800;
     color: #FFD700;
-    font-size: 1.5rem;
-}
-
-.logo-area .pink-icon {
-    color: #FFB6C1;
-    font-size: 1.5rem;
+    margin: 0;
 }
 
 .logo-area span {
-    font-weight: 800;
-    font-size: 0.95rem;
-    background: linear-gradient(135deg, #FFD700, #FFB6C1, #fff);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .user-area {
@@ -271,10 +217,6 @@ body::after {
     gap: 12px;
     font-size: 0.85rem;
     flex-wrap: wrap;
-    color: white;
-}
-
-.user-area span {
     color: white;
 }
 
@@ -324,19 +266,9 @@ body::after {
 }
 
 .dropdown-content a:hover {
-    background: linear-gradient(90deg, rgba(255, 215, 0, 0.1), rgba(255, 182, 193, 0.1));
+    background: rgba(255, 215, 0, 0.1);
     color: #FFD700;
     padding-left: 25px;
-}
-
-.dropdown-content a .icon {
-    color: #FFD700;
-    margin-right: 8px;
-}
-
-.dropdown-content a .pink-icon {
-    color: #FFB6C1;
-    margin-right: 8px;
 }
 
 .show {
@@ -354,7 +286,7 @@ body::after {
 
 .panel {
     display: none;
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.08), rgba(255, 215, 0, 0.03));
+    background: rgba(0, 100, 0, 0.05);
     backdrop-filter: blur(10px);
     border-radius: 28px;
     padding: 18px 16px;
@@ -363,16 +295,6 @@ body::after {
     border: 1px solid rgba(255, 215, 0, 0.05);
     position: relative;
     overflow: hidden;
-}
-
-.panel::before {
-    content: '✦';
-    position: absolute;
-    bottom: -20px;
-    right: -10px;
-    font-size: 80px;
-    color: rgba(255, 182, 193, 0.03);
-    pointer-events: none;
 }
 
 .panel.active-panel,
@@ -394,243 +316,6 @@ body::after {
     padding-left: 14px;
     font-size: 1.2rem;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-}
-
-.panel h2 .icon,
-.panel h3 .icon {
-    color: #FFD700;
-    margin-right: 6px;
-}
-
-.panel h2 .pink-icon,
-.panel h3 .pink-icon {
-    color: #FFB6C1;
-    margin-right: 6px;
-}
-
-/* ==================== DASHBOARD PANEL ==================== */
-#dashboardPanel {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.05), rgba(255, 215, 0, 0.03));
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 215, 0, 0.05);
-    border-radius: 28px;
-    padding: 18px 16px;
-    margin-bottom: 25px;
-    color: white;
-    position: relative;
-    overflow: hidden;
-}
-
-#dashboardPanel::before {
-    content: '✦';
-    position: absolute;
-    bottom: -20px;
-    right: -10px;
-    font-size: 100px;
-    color: rgba(255, 215, 0, 0.03);
-    pointer-events: none;
-}
-
-#dashboardPanel::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle at 30% 40%, rgba(255, 215, 0, 0.03) 0%, transparent 50%);
-    animation: glowPulse 8s ease-in-out infinite;
-    pointer-events: none;
-    z-index: 0;
-}
-
-@keyframes glowPulse {
-    0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.5; }
-    50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
-}
-
-#dashboardPanel > * {
-    position: relative;
-    z-index: 1;
-}
-
-#dashboardPanel h2,
-#dashboardPanel h3,
-#dashboardPanel p,
-#dashboardPanel span,
-#dashboardPanel strong,
-#dashboardPanel li,
-#dashboardPanel .info-data p,
-#dashboardPanel .info-data {
-    color: white !important;
-}
-
-#dashboardPanel .info-data {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.05), rgba(255, 215, 0, 0.05)) !important;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 215, 0, 0.08) !important;
-}
-
-#dashboardPanel .teacher-card,
-#dashboardPanel .social-card,
-#dashboardPanel .attendance-card {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.05), rgba(255, 215, 0, 0.05)) !important;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 182, 193, 0.08) !important;
-    color: white !important;
-}
-
-#dashboardPanel .teacher-card h4,
-#dashboardPanel .teacher-card p,
-#dashboardPanel .social-card p,
-#dashboardPanel .attendance-card p {
-    color: white !important;
-}
-
-#dashboardPanel .teacher-card img {
-    border-color: rgba(255, 215, 0, 0.3) !important;
-}
-
-#dashboardPanel .teacher-card:hover {
-    background: linear-gradient(145deg, rgba(255, 215, 0, 0.1), rgba(255, 182, 193, 0.1)) !important;
-    transform: translateY(-5px);
-    box-shadow: 0 8px 30px rgba(255, 215, 0, 0.2);
-}
-
-#dashboardPanel .btn-blue {
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 182, 193, 0.1)) !important;
-    color: white !important;
-    border: 1px solid rgba(255, 215, 0, 0.1) !important;
-}
-
-#dashboardPanel .btn-blue:hover {
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 182, 193, 0.2)) !important;
-}
-
-#dashboardPanel .btn-green {
-    background: linear-gradient(135deg, rgba(0, 100, 0, 0.2), rgba(255, 215, 0, 0.1)) !important;
-    color: white !important;
-    border: 1px solid rgba(255, 215, 0, 0.3) !important;
-}
-
-#dashboardPanel .btn-green:hover {
-    background: linear-gradient(135deg, rgba(0, 100, 0, 0.35), rgba(255, 215, 0, 0.2)) !important;
-}
-
-#dashboardPanel .btn-orange {
-    background: linear-gradient(135deg, rgba(245, 176, 66, 0.2), rgba(255, 182, 193, 0.1)) !important;
-    color: white !important;
-    border: 1px solid rgba(245, 176, 66, 0.2) !important;
-}
-
-#dashboardPanel .btn-orange:hover {
-    background: linear-gradient(135deg, rgba(245, 176, 66, 0.3), rgba(255, 182, 193, 0.2)) !important;
-}
-
-#dashboardPanel .today-routine-card {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.08), rgba(255, 215, 0, 0.05)) !important;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 215, 0, 0.1) !important;
-    color: white !important;
-}
-
-#dashboardPanel .tomorrow-routine-card {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.08), rgba(255, 182, 193, 0.05)) !important;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 182, 193, 0.1) !important;
-    color: white !important;
-}
-
-#dashboardPanel .today-routine-card p,
-#dashboardPanel .tomorrow-routine-card p {
-    color: rgba(255, 255, 255, 0.95) !important;
-}
-
-#dashboardPanel .student-info-card {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.08), rgba(255, 215, 0, 0.05)) !important;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 215, 0, 0.1) !important;
-}
-
-#dashboardPanel .student-info-card p,
-#dashboardPanel .student-info-card h3 {
-    color: white !important;
-}
-
-#dashboardPanel #studentOwnRoutine .routine-card {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.05), rgba(255, 215, 0, 0.05)) !important;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 182, 193, 0.08) !important;
-    color: white !important;
-}
-
-#dashboardPanel #studentOwnRoutine .routine-card p,
-#dashboardPanel #studentOwnRoutine .routine-card strong,
-#dashboardPanel #studentOwnRoutine .routine-card td,
-#dashboardPanel #studentOwnRoutine .routine-card th {
-    color: white !important;
-}
-
-#dashboardPanel #studentOwnRoutine .routine-table th {
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 182, 193, 0.1)) !important;
-    color: white !important;
-}
-
-#dashboardPanel #studentOwnRoutine .routine-table td {
-    border-color: rgba(255, 215, 0, 0.1) !important;
-}
-
-#dashboardPanel #studentOwnRoutine .routine-table tr:hover {
-    background: rgba(255, 215, 0, 0.05) !important;
-}
-
-#dashboardPanel table th {
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 182, 193, 0.1)) !important;
-    color: white !important;
-}
-
-#dashboardPanel table td {
-    color: white !important;
-    border-color: rgba(255, 215, 0, 0.05) !important;
-}
-
-#dashboardPanel table tr:hover {
-    background: rgba(255, 215, 0, 0.03) !important;
-}
-
-#dashboardPanel input,
-#dashboardPanel select,
-#dashboardPanel textarea {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.05), rgba(255, 215, 0, 0.03)) !important;
-    color: white !important;
-    border: 1px solid rgba(255, 215, 0, 0.1) !important;
-}
-
-#dashboardPanel input::placeholder,
-#dashboardPanel textarea::placeholder {
-    color: rgba(255, 255, 255, 0.4) !important;
-}
-
-#dashboardPanel input:focus,
-#dashboardPanel select:focus,
-#dashboardPanel textarea:focus {
-    border-color: rgba(255, 215, 0, 0.3) !important;
-    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.05) !important;
-}
-
-#dashboardPanel .class-btn {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.05), rgba(255, 215, 0, 0.03)) !important;
-    color: white !important;
-    border: 1px solid rgba(255, 215, 0, 0.05) !important;
-}
-
-#dashboardPanel .class-btn:hover {
-    background: linear-gradient(145deg, rgba(255, 215, 0, 0.1), rgba(255, 182, 193, 0.1)) !important;
-}
-
-#dashboardPanel .class-btn.active {
-    background: linear-gradient(145deg, rgba(255, 215, 0, 0.15), rgba(255, 182, 193, 0.15)) !important;
-    border-color: rgba(255, 215, 0, 0.2) !important;
 }
 
 /* ==================== BUTTONS ==================== */
@@ -722,20 +407,6 @@ body::after {
     overflow: hidden;
 }
 
-.tomorrow-routine-card::before {
-    content: '✦';
-    position: absolute;
-    bottom: -10px;
-    right: 5px;
-    font-size: 60px;
-    color: rgba(255, 182, 193, 0.05);
-}
-
-.tomorrow-routine-card h3,
-.tomorrow-routine-card p {
-    color: white !important;
-}
-
 .today-routine-card {
     flex: 1;
     min-width: 280px;
@@ -749,20 +420,6 @@ body::after {
     color: white;
     position: relative;
     overflow: hidden;
-}
-
-.today-routine-card::before {
-    content: '✦';
-    position: absolute;
-    bottom: -10px;
-    right: 5px;
-    font-size: 60px;
-    color: rgba(255, 215, 0, 0.05);
-}
-
-.today-routine-card h3,
-.today-routine-card p {
-    color: white !important;
 }
 
 @keyframes flashGradient {
@@ -791,7 +448,7 @@ th, td {
 }
 
 th {
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 182, 193, 0.15));
+    background: rgba(255, 215, 0, 0.15);
     color: white;
     font-weight: 600;
 }
@@ -813,7 +470,7 @@ input, select, textarea {
     font-size: 14px;
     margin-bottom: 8px;
     transition: 0.3s;
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.05), rgba(255, 215, 0, 0.03));
+    background: rgba(0, 100, 0, 0.05);
     color: white;
 }
 
@@ -832,16 +489,6 @@ select option {
     color: white;
 }
 
-/* ==================== INFO DATA ==================== */
-.info-data {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.05), rgba(255, 215, 0, 0.03));
-    border-radius: 28px;
-    padding: 18px;
-    text-align: left;
-    border: 1px solid rgba(255, 215, 0, 0.1);
-    color: rgba(255, 255, 255, 0.9);
-}
-
 /* ==================== TEACHER GRID ==================== */
 .teacher-grid {
     display: grid;
@@ -851,7 +498,7 @@ select option {
 }
 
 .teacher-card {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.05), rgba(255, 215, 0, 0.03));
+    background: rgba(0, 100, 0, 0.05);
     border-radius: 28px;
     padding: 18px;
     text-align: center;
@@ -862,17 +509,8 @@ select option {
     overflow: hidden;
 }
 
-.teacher-card::before {
-    content: '✦';
-    position: absolute;
-    top: -10px;
-    right: 5px;
-    font-size: 40px;
-    color: rgba(255, 182, 193, 0.05);
-}
-
 .teacher-card:hover {
-    background: linear-gradient(145deg, rgba(255, 215, 0, 0.08), rgba(255, 182, 193, 0.08));
+    background: rgba(255, 215, 0, 0.08);
     transform: translateY(-5px);
     box-shadow: 0 8px 30px rgba(255, 215, 0, 0.2);
 }
@@ -886,183 +524,9 @@ select option {
     border: 3px solid rgba(255, 215, 0, 0.3);
 }
 
-.teacher-card h4,
-.teacher-card p {
-    color: white !important;
-}
-
-/* ==================== STUDENT LIST ==================== */
-.student-list-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px;
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.05), rgba(255, 215, 0, 0.03));
-    border-radius: 20px;
-    margin-bottom: 8px;
-}
-
-.student-list-item img {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 2px solid rgba(255, 215, 0, 0.3);
-}
-
-.image-preview {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 50%;
-    margin: 8px auto;
-    display: block;
-    border: 2px solid rgba(255, 215, 0, 0.3);
-}
-
-.file-input-label {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.05), rgba(255, 215, 0, 0.03));
-    padding: 8px 12px;
-    border-radius: 30px;
-    cursor: pointer;
-    font-size: 12px;
-    display: inline-block;
-    margin: 5px 0;
-    transition: 0.3s;
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.file-input-label:hover {
-    background: linear-gradient(145deg, rgba(255, 215, 0, 0.1), rgba(255, 182, 193, 0.1));
-    color: white;
-}
-
-/* ==================== GROUP FIELD STYLES ==================== */
-.group-field-visible {
-    display: block !important;
-    animation: slideDown 0.3s ease;
-}
-
-.group-field-hidden {
-    display: none !important;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.student-group-tag {
-    background: rgba(255, 215, 0, 0.2);
-    color: white;
-    padding: 2px 12px;
-    border-radius: 20px;
-    font-size: 11px;
-    display: inline-block;
-    font-weight: 600;
-}
-
-.student-group-tag.science {
-    background: linear-gradient(135deg, #006400, #FFD700);
-}
-
-.student-group-tag.commerce {
-    background: linear-gradient(135deg, #f39c12, #FFB6C1);
-}
-
-.student-group-tag.arts {
-    background: linear-gradient(135deg, #9b59b6, #FFB6C1);
-}
-
-/* ==================== SSC SPECIAL BADGE ==================== */
-.ssc-special-badge {
-    background: linear-gradient(135deg, #006400, #228B22, #FFD700);
-    color: white;
-    padding: 4px 16px;
-    border-radius: 30px;
-    font-size: 12px;
-    font-weight: 700;
-    display: inline-block;
-    animation: sscPulse 2s ease-in-out infinite;
-    border: 2px solid #FFD700;
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
-}
-
-.ssc-special-badge .icon {
-    margin-right: 4px;
-}
-
-.ssc-special-badge .pink-icon {
-    margin-right: 4px;
-    color: #FFB6C1;
-}
-
-@keyframes sscPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
-/* ==================== SOCIAL CARDS ==================== */
-.social-card {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.05), rgba(255, 215, 0, 0.03));
-    padding: 16px;
-    border-radius: 24px;
-    margin-bottom: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: 0.3s;
-    color: white;
-}
-
-.social-card:hover {
-    background: linear-gradient(145deg, rgba(255, 215, 0, 0.05), rgba(255, 182, 193, 0.05));
-    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.2);
-    transition: 0.3s;
-}
-
-.social-card p,
-.social-card strong,
-.social-card span {
-    color: white !important;
-}
-
-.social-card .reaction-btn {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.05), rgba(255, 215, 0, 0.03));
-    color: white;
-}
-
-.social-card .reaction-btn:hover {
-    background: linear-gradient(145deg, rgba(255, 215, 0, 0.1), rgba(255, 182, 193, 0.1));
-}
-
-.social-card .reaction-btn.active {
-    background: linear-gradient(135deg, #228B22, #FFD700);
-    color: white;
-}
-
-.delete-post-btn {
-    background: linear-gradient(135deg, #c52828, #FFB6C1);
-    color: white;
-    border: none;
-    border-radius: 20px;
-    padding: 4px 12px;
-    cursor: pointer;
-    font-size: 12px;
-    float: right;
-}
-
-.delete-post-btn:hover {
-    background: linear-gradient(135deg, #FFB6C1, #c52828);
-}
-
 /* ==================== ATTENDANCE ==================== */
 .attendance-card {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.05), rgba(255, 215, 0, 0.03));
+    background: rgba(0, 100, 0, 0.05);
     border-radius: 24px;
     padding: 20px;
     margin-bottom: 24px;
@@ -1070,15 +534,6 @@ select option {
     color: white;
     position: relative;
     overflow: hidden;
-}
-
-.attendance-card::before {
-    content: '✦';
-    position: absolute;
-    bottom: -10px;
-    right: 5px;
-    font-size: 50px;
-    color: rgba(255, 182, 193, 0.04);
 }
 
 .calendar-grid {
@@ -1089,7 +544,7 @@ select option {
 }
 
 .cal-day-header {
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 182, 193, 0.15));
+    background: rgba(255, 215, 0, 0.15);
     color: white;
     padding: 10px;
     text-align: center;
@@ -1110,13 +565,13 @@ select option {
 }
 
 .cal-day.present {
-    background: linear-gradient(135deg, rgba(0, 100, 0, 0.2), rgba(255, 215, 0, 0.1));
+    background: rgba(0, 100, 0, 0.2);
     color: #FFD700;
     border-color: rgba(255, 215, 0, 0.3);
 }
 
 .cal-day.absent {
-    background: linear-gradient(135deg, rgba(231, 76, 60, 0.2), rgba(255, 182, 193, 0.1));
+    background: rgba(231, 76, 60, 0.2);
     color: #FFB6C1;
     border-color: rgba(255, 182, 193, 0.3);
 }
@@ -1146,22 +601,12 @@ select option {
     flex-wrap: wrap;
 }
 
-.month-selector button {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.05), rgba(255, 215, 0, 0.03));
-    color: white;
-    border: 1px solid rgba(255, 215, 0, 0.05);
-}
-
-.month-selector button:hover {
-    background: linear-gradient(145deg, rgba(255, 215, 0, 0.1), rgba(255, 182, 193, 0.1));
-}
-
 .month-selector span {
     color: white;
 }
 
 .attendance-summary {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.15), rgba(255, 215, 0, 0.1), rgba(255, 182, 193, 0.05));
+    background: rgba(0, 100, 0, 0.15);
     color: white;
     padding: 15px;
     border-radius: 20px;
@@ -1169,10 +614,6 @@ select option {
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
-}
-
-.summary-item {
-    text-align: center;
 }
 
 .summary-item .number {
@@ -1202,7 +643,7 @@ select option {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(90deg, rgba(34, 139, 34, 0.2), rgba(255, 215, 0, 0.2));
+    background: rgba(34, 139, 34, 0.2);
     transition: 0.3s;
     border-radius: 34px;
 }
@@ -1235,20 +676,6 @@ input:checked + .slider:before {
     border-bottom: 1px solid rgba(255, 215, 0, 0.05);
 }
 
-.student-att-row:hover {
-    background: rgba(255, 215, 0, 0.03);
-}
-
-/* ==================== TEACHER CLASS CARD ==================== */
-.teacher-class-card {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.03), rgba(255, 215, 0, 0.03));
-    border-radius: 20px;
-    padding: 20px;
-    margin-bottom: 20px;
-    border: 1px solid rgba(255, 215, 0, 0.05);
-    color: white;
-}
-
 /* ==================== CLASS BUTTONS ==================== */
 .class-buttons-container {
     display: flex;
@@ -1259,22 +686,8 @@ input:checked + .slider:before {
     max-height: 400px;
     overflow-y: auto;
     padding: 15px 10px 15px 30px;
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.03), rgba(255, 215, 0, 0.03));
-    border-radius: 20px;
-}
-
-.class-buttons-container::-webkit-scrollbar {
-    width: 6px;
-}
-
-.class-buttons-container::-webkit-scrollbar-track {
     background: rgba(0, 100, 0, 0.03);
-    border-radius: 10px;
-}
-
-.class-buttons-container::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 182, 193, 0.3));
-    border-radius: 10px;
+    border-radius: 20px;
 }
 
 .class-btn {
@@ -1283,7 +696,7 @@ input:checked + .slider:before {
     min-width: 200px;
     text-align: left;
     margin: 0;
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.05), rgba(255, 215, 0, 0.03));
+    background: rgba(0, 100, 0, 0.05);
     padding: 12px 20px 12px 25px;
     border-radius: 40px;
     cursor: pointer;
@@ -1295,16 +708,15 @@ input:checked + .slider:before {
 }
 
 .class-btn:hover {
-    background: linear-gradient(145deg, rgba(255, 215, 0, 0.1), rgba(255, 182, 193, 0.1));
+    background: rgba(255, 215, 0, 0.1);
     color: white;
     transform: translateX(8px);
 }
 
 .class-btn.active {
-    background: linear-gradient(145deg, rgba(255, 215, 0, 0.15), rgba(255, 182, 193, 0.15));
+    background: rgba(255, 215, 0, 0.15);
     color: white;
     border-color: rgba(255, 215, 0, 0.2);
-    box-shadow: 0 2px 20px rgba(255, 215, 0, 0.05);
 }
 
 /* ==================== MODALS ==================== */
@@ -1317,7 +729,7 @@ input:checked + .slider:before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(26, 10, 46, 0.9));
+    background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(10px);
     z-index: 2000;
     justify-content: center;
@@ -1330,8 +742,10 @@ input:checked + .slider:before {
     to { opacity: 1; transform: scale(1); }
 }
 
-.results-card {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.1), rgba(255, 215, 0, 0.05), rgba(255, 182, 193, 0.03));
+.results-card,
+.about-card,
+.routine-card {
+    background: rgba(0, 100, 0, 0.1);
     backdrop-filter: blur(10px);
     padding: 35px 30px;
     border-radius: 30px;
@@ -1345,101 +759,10 @@ input:checked + .slider:before {
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
 }
 
-.results-card h2 {
-    color: white !important;
-    font-size: 32px;
-    font-weight: 900;
-    margin-bottom: 8px;
-    letter-spacing: 1px;
-}
-
-.results-card h2 .icon {
-    color: #FFD700;
-}
-
-.results-card h2 .pink-icon {
-    color: #FFB6C1;
-}
-
-.results-card p {
-    color: rgba(255, 255, 255, 0.9) !important;
-    line-height: 1.8;
-}
-
-.about-card {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.1), rgba(255, 215, 0, 0.05), rgba(255, 182, 193, 0.03));
-    backdrop-filter: blur(10px);
-    padding: 30px;
-    border-radius: 30px;
-    max-width: 500px;
-    width: 90%;
-    text-align: center;
-    max-height: 80vh;
-    overflow-y: auto;
-    color: white;
-    border: 1px solid rgba(255, 215, 0, 0.1);
-}
-
-.routine-card {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.1), rgba(255, 215, 0, 0.05), rgba(255, 182, 193, 0.03));
-    backdrop-filter: blur(10px);
-    padding: 30px;
-    border-radius: 30px;
-    max-width: 500px;
-    width: 90%;
-    text-align: center;
-    max-height: 80vh;
-    overflow-y: auto;
-    color: white;
-    border: 1px solid rgba(255, 215, 0, 0.1);
-}
-
-.about-card p,
-.routine-card p,
+.results-card h2,
 .about-card h2,
 .routine-card h2 {
     color: white !important;
-}
-
-.results-card .btn-aca-result h3 a,
-.about-card .btn-aca-result h3 a,
-.routine-card .btn-aca-result h3 a {
-    color: white !important;
-}
-
-.results-card .btn-aca-result,
-.about-card .btn-aca-result,
-.routine-card .btn-aca-result {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.05), rgba(255, 215, 0, 0.03));
-    border-radius: 50px;
-    padding: 10px;
-    margin: 10px 0;
-}
-
-.results-card .btn,
-.about-card .btn,
-.routine-card .btn {
-    background: linear-gradient(135deg, #228B22, #FFD700);
-    color: white;
-}
-
-.results-card .btn:hover,
-.about-card .btn:hover,
-.routine-card .btn:hover {
-    background: linear-gradient(135deg, #FFD700, #228B22);
-}
-
-.results-card::-webkit-scrollbar,
-.about-card::-webkit-scrollbar,
-.routine-card::-webkit-scrollbar {
-    width: 6px;
-}
-
-.results-card::-webkit-scrollbar-thumb,
-.about-card::-webkit-scrollbar-thumb,
-.routine-card::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 182, 193, 0.3));
-    border-radius: 10px;
 }
 
 .routine-table {
@@ -1456,51 +779,13 @@ input:checked + .slider:before {
 }
 
 .routine-table th {
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 182, 193, 0.1));
+    background: rgba(255, 215, 0, 0.1);
     color: white;
-}
-
-.routine-table td {
-    color: rgba(255, 255, 255, 0.9);
-}
-
-/* ==================== STUDENT OWN ROUTINE ==================== */
-#studentOwnRoutine {
-    animation: fadeSlide 0.5s ease;
-}
-
-#studentOwnRoutine .routine-card {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.05), rgba(255, 215, 0, 0.05)) !important;
-    backdrop-filter: blur(5px);
-    border-radius: 20px !important;
-    padding: 20px !important;
-    border: 1px solid rgba(255, 182, 193, 0.05) !important;
-    color: white !important;
-}
-
-#studentOwnRoutine .routine-card p,
-#studentOwnRoutine .routine-card strong,
-#studentOwnRoutine .routine-card td,
-#studentOwnRoutine .routine-card th {
-    color: white !important;
-}
-
-#studentOwnRoutine .routine-table th {
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 182, 193, 0.1)) !important;
-    color: white !important;
-}
-
-#studentOwnRoutine .routine-table td {
-    border-color: rgba(255, 215, 0, 0.05) !important;
-}
-
-#studentOwnRoutine .routine-table tr:hover {
-    background: rgba(255, 215, 0, 0.02) !important;
 }
 
 /* ==================== STUDENT INFO CARD ==================== */
 .student-info-card {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.1), rgba(255, 215, 0, 0.05));
+    background: rgba(0, 100, 0, 0.1);
     backdrop-filter: blur(5px);
     color: white;
     padding: 15px;
@@ -1510,35 +795,13 @@ input:checked + .slider:before {
     border: 1px solid rgba(255, 215, 0, 0.05);
 }
 
-.student-info-card h3 {
-    color: white;
-    border-left: none;
-    padding-left: 0;
-}
-
-.student-info-card h3 .icon {
-    color: #FFD700;
-}
-
-.student-info-card h3 .pink-icon {
-    color: #FFB6C1;
-}
-
-.student-info-card p {
-    color: rgba(255, 255, 255, 0.9);
-}
-
 /* ==================== FEEDBACK ==================== */
 .feedback-item {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.03), rgba(255, 215, 0, 0.03));
+    background: rgba(0, 100, 0, 0.03);
     border-radius: 16px;
     padding: 12px;
     margin-bottom: 10px;
     border-left: 4px solid #FFD700;
-    color: white;
-}
-
-.feedback-item p {
     color: white;
 }
 
@@ -1554,11 +817,22 @@ input:checked + .slider:before {
     transition: 0.2s;
 }
 
-.delete-btn:hover {
-    background: linear-gradient(135deg, #FFB6C1, #c52828);
+/* ==================== SOCIAL FEED ==================== */
+.social-card {
+    background: rgba(0, 100, 0, 0.05);
+    padding: 16px;
+    border-radius: 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: 0.3s;
+    color: white;
 }
 
-/* ==================== REACTIONS ==================== */
+.social-card:hover {
+    background: rgba(255, 215, 0, 0.05);
+    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.2);
+}
+
 .reaction-bar {
     display: flex;
     gap: 8px;
@@ -1567,7 +841,7 @@ input:checked + .slider:before {
 }
 
 .reaction-btn {
-    background: linear-gradient(145deg, rgba(0, 100, 0, 0.05), rgba(255, 215, 0, 0.03));
+    background: rgba(0, 100, 0, 0.05);
     border: 1px solid rgba(255, 215, 0, 0.05);
     border-radius: 30px;
     padding: 5px 12px;
@@ -1578,7 +852,7 @@ input:checked + .slider:before {
 }
 
 .reaction-btn:hover {
-    background: linear-gradient(145deg, rgba(255, 215, 0, 0.1), rgba(255, 182, 193, 0.1));
+    background: rgba(255, 215, 0, 0.1);
     transform: scale(1.05);
 }
 
@@ -1587,26 +861,87 @@ input:checked + .slider:before {
     color: white;
 }
 
-.reaction-count {
-    margin-left: 4px;
+.delete-post-btn {
+    background: linear-gradient(135deg, #c52828, #FFB6C1);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 4px 12px;
+    cursor: pointer;
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.5);
+    float: right;
 }
 
-/* ==================== EMPTY STATE ==================== */
-.empty-state {
-    text-align: center;
-    padding: 40px;
-    color: rgba(255, 255, 255, 0.5);
+/* ==================== IMAGE PREVIEW ==================== */
+.image-preview {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin: 8px auto;
+    display: block;
+    border: 2px solid rgba(255, 215, 0, 0.3);
+}
+
+.file-input-label {
+    background: rgba(0, 100, 0, 0.05);
+    padding: 8px 12px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 12px;
+    display: inline-block;
+    margin: 5px 0;
+    transition: 0.3s;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.file-input-label:hover {
+    background: rgba(255, 215, 0, 0.1);
+    color: white;
+}
+
+/* ==================== GROUP TAGS ==================== */
+.student-group-tag {
+    background: rgba(255, 215, 0, 0.2);
+    color: white;
+    padding: 2px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    display: inline-block;
+    font-weight: 600;
+}
+
+.student-group-tag.science {
+    background: linear-gradient(135deg, #006400, #FFD700);
+}
+
+.student-group-tag.commerce {
+    background: linear-gradient(135deg, #f39c12, #FFB6C1);
+}
+
+.student-group-tag.arts {
+    background: linear-gradient(135deg, #9b59b6, #FFB6C1);
+}
+
+.ssc-special-badge {
+    background: linear-gradient(135deg, #006400, #228B22, #FFD700);
+    color: white;
+    padding: 4px 16px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-block;
+    animation: sscPulse 2s ease-in-out infinite;
+    border: 2px solid #FFD700;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+}
+
+@keyframes sscPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
 }
 
 /* ==================== RESPONSIVE ==================== */
-@media (max-width: 1024px) {
-    .teacher-grid {
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    }
-}
-
 @media (max-width: 768px) {
     .navbar {
         flex-direction: column;
@@ -1665,10 +1000,6 @@ input:checked + .slider:before {
         width: 80px;
         height: 80px;
     }
-    
-    body::before {
-        font-size: 30vh;
-    }
 }
 
 @media (max-width: 480px) {
@@ -1710,30 +1041,9 @@ input:checked + .slider:before {
         flex-wrap: wrap;
         gap: 8px;
     }
-    
-    .student-att-row span {
-        font-size: 13px;
-    }
-    
-    body::before {
-        font-size: 20vh;
-    }
 }
 
-/* ==================== DASHBOARD HEADER ==================== */
-.dashboard-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-bottom: 16px;
-}
-
-.dashboard-header .btn {
-    margin: 3px 5px;
-}
-
-/* ==================== SCROLLBAR STYLING ==================== */
+/* ==================== SCROLLBAR ==================== */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -1745,90 +1055,36 @@ input:checked + .slider:before {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 182, 193, 0.3));
+    background: rgba(255, 215, 0, 0.3);
     border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.5), rgba(255, 182, 193, 0.5));
+    background: rgba(255, 215, 0, 0.5);
 }
 
-/* ==================== PRINT STYLES ==================== */
-@media print {
-    .navbar,
-    .btn,
-    .menu-btn,
-    .dropdown,
-    #canvas-container,
-    .decoration,
-    body::before,
-    body::after {
-        display: none !important;
-    }
-    
-    .panel {
-        box-shadow: none !important;
-        border: 1px solid #ddd;
-        background: white !important;
-        color: black !important;
-    }
-    
-    .panel h2,
-    .panel h3,
-    .panel p {
-        color: black !important;
-    }
-}
-
-/* ==================== UTILITY CLASSES ==================== */
-.text-center {
+/* ==================== UTILITY ==================== */
+.empty-state {
     text-align: center;
+    padding: 40px;
+    color: rgba(255, 255, 255, 0.5);
 }
 
-.text-left {
+.info-data {
+    background: rgba(0, 100, 0, 0.05);
+    border-radius: 28px;
+    padding: 18px;
     text-align: left;
+    border: 1px solid rgba(255, 215, 0, 0.1);
+    color: rgba(255, 255, 255, 0.9);
 }
 
-.text-right {
-    text-align: right;
-}
-
-.mt-10 {
-    margin-top: 10px;
-}
-
-.mt-20 {
-    margin-top: 20px;
-}
-
-.mb-10 {
-    margin-bottom: 10px;
-}
-
-.mb-20 {
-    margin-bottom: 20px;
-}
-
-.flex {
+.dashboard-header {
     display: flex;
-}
-
-.flex-center {
-    display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-}
-
-.gap-10 {
-    gap: 10px;
-}
-
-.gap-20 {
-    gap: 20px;
-}
-
-.w-full {
-    width: 100%;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
 }
 
 .hidden {
