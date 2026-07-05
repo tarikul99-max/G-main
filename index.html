@@ -10,14 +10,14 @@
 </head>
 <body>
 
-<!-- ==================== 3D GOLDEN OCEAN BACKGROUND ==================== -->
+<!-- ==================== LIGHTWEIGHT ANIMATED BACKGROUND ==================== -->
 <div id="canvas-container"></div>
 
 <!-- ==================== LOGIN SCREEN ==================== -->
 <div id="loginScreen" class="login-screen">
     <div class="login-card">
         <div align="center">
-            <img src="logo.jpeg" alt="Logo" style="height:50px; width:50px; object-fit:contain; border-radius:14px; border:2px solid rgba(255,215,0,0.2);">
+            <img src="logo.jpeg" alt="Logo" style="height:55px; width:55px; object-fit:contain; border-radius:16px; border:2px solid rgba(255,215,0,0.2); box-shadow:0 4px 20px rgba(255,215,0,0.1);">
         </div>
         <h3>✨ GLORIOUS EDUCATION CARE ✨</h3>
         <form id="loginForm">
@@ -30,8 +30,9 @@
             <input type="password" id="loginPassword" placeholder="পাসওয়ার্ড" required>
             <button type="submit"><i class="fas fa-arrow-right-to-bracket"></i> প্রবেশ করুন</button>
         </form>
-        <p style="margin-top:12px; font-size:11px; color:rgba(255,255,255,0.7);">
-            <strong>⚠️ পাসওয়ার্ড ও আইডি ভুলে গেলে অফিসে যোগাযোগ করুন। কাউকে পাসওয়ার্ড দিবেন না।</strong>
+        <p style="margin-top:14px; font-size:11px; color:rgba(255,255,255,0.6); line-height:1.6;">
+            <strong>⚠️ পাসওয়ার্ড ও আইডি ভুলে গেলে অফিসে যোগাযোগ করুন।</strong><br>
+            <span style="font-size:10px; opacity:0.7;">কাউকে পাসওয়ার্ড দিবেন না।</span>
         </p>
     </div>
 </div>
@@ -43,12 +44,14 @@
     <nav class="navbar" id="mainNavbar">
         <div class="logo-area">
             <img src="logo.jpeg" alt="Logo">
-            <h1>GLORIOUS</h1>
-            <span class="edu-text">Education <span class="care">Care</span></span>
+            <div class="brand-text">
+                <h1>GLORIOUS</h1>
+                <span class="edu-text">Education Care</span>
+            </div>
         </div>
         <div class="user-area">
-            <span id="userNameDisplay"></span>
-            <span id="roleDisplay"></span>
+            <span class="user-name" id="userNameDisplay"></span>
+            <span class="user-role" id="roleDisplay"></span>
             <button class="btn btn-orange" id="viewResultBtn">
                 <i class="fas fa-file-alt"></i> ফলাফল দেখুন
             </button>
@@ -73,7 +76,8 @@
 
     <!-- ==================== CONTENT ==================== -->
     <div class="content">
-        <!-- DASHBOARD PANEL -->
+        
+        <!-- ==================== DASHBOARD PANEL ==================== -->
         <div id="dashboardPanel" class="panel active-panel">
             <div class="dashboard-header">
                 <div style="display: flex; gap: 12px; flex-wrap: wrap;">
@@ -128,13 +132,13 @@
             </div>
         </div>
         
-        <!-- STUDENT FEEDBACK PANEL -->
+        <!-- ==================== STUDENT FEEDBACK PANEL ==================== -->
         <div id="studentPanel" class="panel">
             <h2><i class="fas fa-comment-dots"></i> শিক্ষকদের মতামত দিন</h2>
             <div id="studentFeedbackArea"></div>
         </div>
         
-        <!-- TEACHER PANEL -->
+        <!-- ==================== TEACHER PANEL ==================== -->
         <div id="teacherPanel" class="panel">
             <h2><i class="fas fa-chalkboard"></i> শিক্ষক ড্যাশবোর্ড</h2>
             <div id="teacherProfileArea"></div>
@@ -142,7 +146,7 @@
             <div id="teacherClassStudents"></div>
         </div>
         
-        <!-- ADMIN TEACHERS PANEL -->
+        <!-- ==================== ADMIN TEACHERS PANEL ==================== -->
         <div id="adminTeachersPanel" class="panel">
             <h2><i class="fas fa-user-plus"></i> শিক্ষক তৈরি করুন</h2>
             <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:28px; margin-bottom:20px; border:1px solid rgba(255,255,255,0.05);">
@@ -160,7 +164,7 @@
             <div class="table-responsive"><div id="teachersTable"></div></div>
         </div>
         
-        <!-- ADMIN CLASS PANEL -->
+        <!-- ==================== ADMIN CLASS PANEL ==================== -->
         <div id="adminClassPanel" class="panel">
             <h2>ক্লাস ম্যানেজার</h2>
             <div id="classButtons" class="class-buttons-container"></div>
@@ -191,7 +195,7 @@
             <div class="table-responsive"><div id="classStudentsTable"></div></div>
         </div>
         
-        <!-- ATTENDANCE PANEL -->
+        <!-- ==================== ATTENDANCE PANEL ==================== -->
         <div id="attendancePanel" class="panel">
             <h2><i class="fas fa-calendar-alt"></i> অ্যাটেন্ডেন্স</h2>
             <div id="studentHistorySection" class="attendance-card" style="display: none;">
@@ -229,14 +233,14 @@
             </div>
         </div>
         
-        <!-- ADMIN FEEDBACK PANEL -->
+        <!-- ==================== ADMIN FEEDBACK PANEL ==================== -->
         <div id="adminFeedbackPanel" class="panel">
             <h2><i class="fas fa-archive"></i> সকল মতামত</h2>
             <select id="feedbackClassFilter" style="margin-bottom:15px;"></select>
             <div id="feedbackList"></div>
         </div>
         
-        <!-- ADMIN ROUTINE PANEL -->
+        <!-- ==================== ADMIN ROUTINE PANEL ==================== -->
         <div id="adminRoutinePanel" class="panel">
             <h2><i class="fas fa-calendar-edit"></i> রুটিন ম্যানেজার</h2>
             <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:24px; margin-bottom:20px; border:1px solid rgba(255,255,255,0.05);">
@@ -263,13 +267,13 @@
             <button class="btn btn-green" id="saveAllRoutinesBtn"><i class="fas fa-save"></i> সব রুটিন সংরক্ষণ করুন</button>
         </div>
         
-        <!-- SOCIAL FEED PANEL -->
+        <!-- ==================== SOCIAL FEED PANEL ==================== -->
         <div id="socialFeedPanel" class="panel">
             <h2><i class="fas fa-comments"></i> সোশ্যাল কানেক্টিভিটি</h2>
             <div style="background:rgba(255,255,255,0.05); padding:20px; border-radius:24px; margin-bottom:20px; border:1px solid rgba(255,255,255,0.05);">
                 <textarea id="feedCaption" rows="3" placeholder="আপনার মনের কথা লিখুন..." style="width:100%; border-radius:16px; font-size:16px;"></textarea>
                 <div style="display:flex; gap:12px; margin-top:12px; flex-wrap:wrap; align-items:center;">
-                    <label style="background:rgba(255,255,255,0.05); padding:10px 20px; border-radius:30px; cursor:pointer; color:rgba(255,255,255,0.7); font-weight:600;">
+                    <label style="background:rgba(255,255,255,0.05); padding:10px 20px; border-radius:30px; cursor:pointer; color:rgba(255,255,255,0.7); font-weight:600; transition:0.3s;">
                         <i class="fas fa-image"></i> নির্বাচন করুন
                         <input type="file" id="feedImageInput" accept="image/*,video/*" multiple style="display:none;">
                     </label>
@@ -283,13 +287,14 @@
         </div>
     </div>
     
-    <footer style="text-align:center; padding:20px; color:rgba(255,255,255,0.2); position:relative; z-index:21; font-size:14px;">
+    <footer style="text-align:center; padding:20px; color:rgba(255,255,255,0.15); position:relative; z-index:21; font-size:14px; letter-spacing:1px;">
         © GLORIOUS Education Care
     </footer>
 </div>
 
 <!-- ==================== MODALS ==================== -->
-<!-- RESULT MODAL -->
+
+<!-- ==================== RESULT MODAL ==================== -->
 <div id="resultModal" class="result-modal" onclick="closeModalOutside(event, 'resultModal')">
     <div class="results-card" onclick="event.stopPropagation()">
         <div style="position:relative; display:inline-block; margin-bottom:15px;">
@@ -299,7 +304,7 @@
         <h2>📊 একাডেমিক ফলাফল</h2>
         <div style="width:100px; height:4px; background:linear-gradient(90deg, #ffd700, #f5a623); margin:12px auto; border-radius:5px;"></div>
         <div style="margin:25px 0;">
-            <a href="about.html" target="_blank" style="display:inline-block; background: linear-gradient(135deg, #ffd700, #f5a623); color: #191970; padding: 16px 45px; border-radius: 60px; text-decoration: none; font-weight: 800; font-size: 20px; box-shadow: 0 4px 30px rgba(255, 215, 0, 0.3);">
+            <a href="about.html" target="_blank" style="display:inline-block; background: linear-gradient(135deg, #ffd700, #f5a623); color: #191970; padding: 16px 45px; border-radius: 60px; text-decoration: none; font-weight: 800; font-size: 20px; box-shadow: 0 4px 30px rgba(255, 215, 0, 0.3); transition:all 0.3s ease;">
                 <i class="fas fa-external-link-alt" style="margin-right:10px;"></i> ফলাফল দেখুন
             </a>
         </div>
@@ -307,41 +312,45 @@
             <p style="margin:5px 0; font-size:16px; color:rgba(255,255,255,0.9);"><i class="fas fa-info-circle" style="color:#ffd700; margin-right:8px;"></i> আপনার পরীক্ষার ফলাফল এখানে প্রকাশিত হবে।</p>
             <p style="margin:5px 0; font-size:14px; color:rgba(255,255,255,0.7);"><i class="fas fa-exclamation-circle" style="color:#f5b042; margin-right:8px;"></i> ফলাফল নিয়ে যেকোনো অভিযোগ অফিসে জানান।</p>
         </div>
-        <p style="margin:20px 0 25px; font-style:italic; font-size:22px; color:#ffd700; font-weight:700;">❝ ধন্যবাদ ❞</p>
-        <button onclick="document.getElementById('resultModal').style.display='none'" style="background:rgba(255,255,255,0.05); color:white; padding:12px 35px; border:1px solid rgba(255,255,255,0.1); border-radius:50px; font-weight:600; font-size:16px; cursor:pointer;">
+        <p style="margin:20px 0 25px; font-style:italic; font-size:22px; color:#ffd700; font-weight:700; text-shadow:0 0 30px rgba(255,215,0,0.1);">❝ ধন্যবাদ ❞</p>
+        <button onclick="document.getElementById('resultModal').style.display='none'" style="background:rgba(255,255,255,0.05); color:white; padding:12px 35px; border:1px solid rgba(255,255,255,0.1); border-radius:50px; font-weight:600; font-size:16px; cursor:pointer; transition:all 0.3s ease;">
             <i class="fas fa-times" style="margin-right:8px;"></i> বন্ধ করুন
         </button>
     </div>
 </div>
 
-<!-- ABOUT MODAL -->
+<!-- ==================== ABOUT MODAL ==================== -->
 <div id="aboutModal" class="about-modal" onclick="closeModalOutside(event, 'aboutModal')">
     <div class="about-card" onclick="event.stopPropagation()">
         <i class="fas fa-school" style="font-size:48px; color:#ffd700; display:block; text-align:center;"></i>
         <h2>GLORIOUS EDUCATION CARE</h2>
-        <p style="margin:15px 0; color:rgba(255,255,255,0.9);">আধুনিক শিক্ষাপ্রতিষ্ঠান যা মানসম্মত শিক্ষা ও প্রযুক্তিনির্ভর ক্লাসরুম ব্যবস্থাপনায় অনন্য।</p>
+        <p style="margin:15px 0; color:rgba(255,255,255,0.9); font-size:16px; line-height:1.7;">আধুনিক শিক্ষাপ্রতিষ্ঠান যা মানসম্মত শিক্ষা ও প্রযুক্তিনির্ভর ক্লাসরুম ব্যবস্থাপনায় অনন্য।</p>
         <p style="color:rgba(255,255,255,0.8);"><strong>📍 ঠিকানা:</strong> পেকুয়া, কক্সবাজার</p>
         <p style="color:rgba(255,255,255,0.8);"><strong>📞 যোগাযোগ:</strong> +8801XXXXXXXX</p>
-        <button class="btn btn-orange" onclick="document.getElementById('aboutModal').style.display='none'" style="margin-top:15px;">বন্ধ করুন</button>
+        <button class="btn btn-orange" onclick="document.getElementById('aboutModal').style.display='none'" style="margin-top:15px; padding:12px 30px;">বন্ধ করুন</button>
     </div>
 </div>
 
-<!-- ROUTINE MODAL -->
+<!-- ==================== ROUTINE MODAL ==================== -->
 <div id="routineModal" class="routine-modal" onclick="closeModalOutside(event, 'routineModal')">
     <div class="routine-card" onclick="event.stopPropagation()">
         <i class="fas fa-calendar-week" style="font-size:48px; color:#ffd700; display:block; text-align:center;"></i>
         <h2>📅 ক্লাস রুটিন</h2>
         <div id="routineContent"></div>
-        <button class="btn btn-orange" onclick="document.getElementById('routineModal').style.display='none'" style="margin-top:15px;">বন্ধ করুন</button>
+        <button class="btn btn-orange" onclick="document.getElementById('routineModal').style.display='none'" style="margin-top:15px; padding:12px 30px;">বন্ধ করুন</button>
     </div>
 </div>
 
 <!-- ==================== SCRIPTS ==================== -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/controls/OrbitControls.js"></script>
+<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-<script src="three.js"></script>
+
+<!-- Main Application Script -->
 <script src="script.js"></script>
+
+<!-- Lightweight Background (CSS Animation) - No Three.js needed! -->
+<script src="lightweight-bg.js"></script>
+
 </body>
 </html>
