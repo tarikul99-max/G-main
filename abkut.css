@@ -7,7 +7,7 @@
 
 body {
     font-family: 'Segoe UI', 'Noto Sans Bengali', 'Nikosh', 'SutonnyMJ', sans-serif;
-    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    background: linear-gradient(135deg,  #004225 0%, #1a0a2e 50%, #2d1b3d 100%);
     min-height: 100vh;
     padding: 20px;
 }
