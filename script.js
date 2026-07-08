@@ -135,6 +135,45 @@ function toggleGroupField(className) {
 window.toggleGroupField = toggleGroupField;
 
 // ============================================================
+// GLORIOUS TEXT - STATIC ROTATE FROM POSITION (No Animation)
+// ============================================================
+function animateGloriousText() {
+    const h1 = document.querySelector('.brand-text h1');
+    if (!h1) return;
+    
+    // Check if already processed
+    if (h1.querySelector('.letter')) return;
+    
+    const text = h1.textContent;
+    if (text !== 'GLORIOUS') return;
+    
+    // Clear the original text
+    h1.textContent = '';
+    
+    // 8 Fixed Colors for GLORIOUS
+    const colors = ['#FF6B6B', '#FF9F43', '#FECA57', '#48DBFB', '#0ABDE3', '#10AC84', '#EE5A24', '#FF6B6B'];
+    
+    // Rotation values as specified
+    const rotations = [20, -14, 8, -12, 14, -15, 16, -20];
+    
+    // Y-axis translation (position offset)
+    const translations = [-3, 2, -4, 1, -2, 3, -1, 2];
+    
+    // Wrap each letter in a span
+    const letters = text.split('');
+    letters.forEach((letter, index) => {
+        const span = document.createElement('span');
+        span.className = 'letter';
+        span.textContent = letter;
+        span.style.display = 'inline-block';
+        span.style.color = colors[index % colors.length];
+        span.style.transform = `rotate(${rotations[index]}deg) translateY(${translations[index]}px)`;
+        span.style.transformOrigin = index % 2 === 0 ? 'center bottom' : 'center top';
+        h1.appendChild(span);
+    });
+}
+
+// ============================================================
 // LOGIN
 // ============================================================
 function performLogin(id, password, role) {
@@ -263,8 +302,8 @@ function showApp() {
                              currentRole === 'teacher' ? 'শিক্ষক' : 'ছাত্র';
     loadAllData();
     
-    // Re-animate GLORIOUS text
-    setTimeout(animateGloriousText, 100);
+    // Re-apply text after login
+    setTimeout(animateGloriousText, 200);
 }
 
 // ============================================================
@@ -280,51 +319,6 @@ window.addEventListener('scroll', function() {
         }
     }
 });
-
-// ============================================================
-// GLORIOUS TEXT ANIMATION
-// ============================================================
-function animateGloriousText() {
-    const h1 = document.querySelector('.logo-area h1');
-    if (!h1) return;
-    
-    const text = h1.textContent;
-    if (text !== 'GLORIOUS') return;
-    
-    // Clear the original text
-    h1.textContent = '';
-    
-    // Wrap each letter in a span with animation
-    const letters = text.split('');
-    letters.forEach((letter, index) => {
-        const span = document.createElement('span');
-        span.className = 'letter';
-        span.textContent = letter;
-        span.style.animationDelay = (index * 0.08) + 's';
-        span.style.display = 'inline-block';
-        span.style.animation = 'letterPop 0.5s ease forwards';
-        span.style.opacity = '0';
-        
-        // Colors for each letter
-        const colors = ['#FF6B6B', '#FF9F43', '#FECA57', '#48DBFB', '#0ABDE3', '#10AC84', '#EE5A24', '#FF6B6B'];
-        span.style.color = colors[index % colors.length];
-        
-        h1.appendChild(span);
-    });
-    
-    // Add the animation CSS if not already added
-    if (!document.getElementById('letterAnimationStyle')) {
-        const style = document.createElement('style');
-        style.id = 'letterAnimationStyle';
-        style.textContent = `
-            @keyframes letterPop {
-                0% { opacity: 0; transform: translateY(-20px) scale(0.5); }
-                100% { opacity: 1; transform: translateY(0) scale(1); }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-}
 
 // ============================================================
 // LOAD ALL DATA
@@ -365,6 +359,7 @@ function loadAllData() {
         renderRoutineEditor();
         renderRoutineModal();
         renderStudentOwnRoutine();
+        renderFullRoutine();
     });
 
     const feedRef = db.ref('feed');
@@ -393,10 +388,91 @@ function loadAllData() {
 }
 
 // ============================================================
-// RENDER FUNCTIONS
+// FULL ROUTINE DISPLAY
 // ============================================================
+function renderFullRoutine() {
+    const container = document.getElementById('fullRoutineDisplay');
+    if (!container) return;
 
-// --- Teachers ---
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const banglaDays = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
+    const today = new Date();
+    const todayName = days[today.getDay()];
+
+    let html = `<div class="table-responsive">
+        <table class="routine-table">
+            <thead>
+                <tr>
+                    <th>ক্লাস</th>
+                    <th>গ্রুপ</th>`;
+
+    days.forEach((day, index) => {
+        const isToday = day === todayName;
+        html += `<th style="${isToday ? 'color:#ffd700; font-weight:800;' : ''}">${banglaDays[index]}${isToday ? ' 📌' : ''}</th>`;
+    });
+
+    html += `</tr></thead><tbody>`;
+
+    const sortedClasses = [...allClasses];
+    sortedClasses.sort((a, b) => {
+        if (a === 'SSC Special') return -1;
+        if (b === 'SSC Special') return 1;
+        return a.localeCompare(b);
+    });
+
+    sortedClasses.forEach(cls => {
+        if (isGroupRequired(cls)) {
+            GROUP_LIST.forEach(grp => {
+                const key = cls + '_' + grp;
+                const icon = GROUP_ICONS[grp] || '';
+                const isSscSpecial = cls === 'SSC Special';
+                const groupTagClass = isSscSpecial ? 'ssc-special' : grp.toLowerCase();
+                
+                html += `<tr><td><strong>${isSscSpecial ? '🎯 ' + cls : cls}</strong></td>
+                    <td><span class="routine-group-tag ${groupTagClass}">${isSscSpecial ? '🎯 ' + icon + ' ' + grp : icon + ' ' + grp}</span></td>`;
+                
+                days.forEach(day => {
+                    const val = allRoutines[day] && allRoutines[day][key] ? allRoutines[day][key] : '-';
+                    const isToday = day === todayName;
+                    html += `<td style="${isToday ? 'background:rgba(255,215,0,0.08); font-weight:600; color:#ffd700;' : ''}">${val}</td>`;
+                });
+                html += '</tr>';
+            });
+        } else {
+            html += `<tr><td><strong>${cls}</strong></td><td>-</td>`;
+            days.forEach(day => {
+                const val = allRoutines[day] && allRoutines[day][cls] ? allRoutines[day][cls] : '-';
+                const isToday = day === todayName;
+                html += `<td style="${isToday ? 'background:rgba(255,215,0,0.08); font-weight:600; color:#ffd700;' : ''}">${val}</td>`;
+            });
+            html += '</tr>';
+        }
+    });
+
+    html += '</tbody></table></div>';
+
+    let hasRoutine = false;
+    for (let day in allRoutines) {
+        if (Object.keys(allRoutines[day]).length > 0) {
+            hasRoutine = true;
+            break;
+        }
+    }
+
+    if (!hasRoutine) {
+        html = `<div class="empty-routine">
+            <i class="fas fa-calendar-times" style="font-size:40px; display:block; margin-bottom:12px; opacity:0.3;"></i>
+            <p>কোনো রুটিন যোগ করা হয়নি।</p>
+            <p style="font-size:14px; opacity:0.6;">অ্যাডমিন রুটিন যোগ করুন।</p>
+        </div>`;
+    }
+
+    container.innerHTML = html;
+}
+
+// ============================================================
+// RENDER TEACHERS - Office Coordinator Support
+// ============================================================
 function renderTeachers() {
     const grid = document.getElementById('teachersGrid');
     if (!grid) return;
@@ -405,13 +481,26 @@ function renderTeachers() {
         const teacher = allTeachers[key];
         const card = document.createElement('div');
         card.className = 'teacher-card';
+        
+        const isCoordinator = teacher.isOfficeCoordinator || false;
+        const coordinatorBadge = isCoordinator ? `
+            <span style="display:inline-block; background:linear-gradient(135deg,#ffd700,#f5a623); color:#191970; padding:4px 16px; border-radius:30px; font-size:13px; font-weight:700; margin-top:8px;">
+                <i class="fas fa-user-tie"></i> Office Coordinator
+            </span>
+        ` : '';
+        
+        const classDisplay = isCoordinator ? 
+            '<p style="font-size:12px; color:rgba(255,255,255,0.4); font-style:italic;">কোন ক্লাস নেই (Coordinator)</p>' : 
+            `<div class="teacher-class-tags" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px;">
+                ${teacher.classes ? teacher.classes.map(c => `<span style="background:rgba(255,215,0,0.15);padding:4px 14px;border-radius:30px;font-size:12px;color:#ffd700;font-weight:600;">${c === 'SSC Special' ? '🎯 ' + c : c}</span>`).join('') : ''}
+            </div>`;
+        
         card.innerHTML = `
             <img src="${teacher.image || 'https://ui-avatars.com/api/?background=1e7b4a&color=fff&name=' + encodeURIComponent(teacher.name)}" alt="${teacher.name}">
             <h4>${teacher.name}</h4>
             <p style="font-size:13px;">আইডি: ${teacher.id}</p>
-            <div class="teacher-class-tags">
-                ${teacher.classes ? teacher.classes.map(c => `<span>${c === 'SSC Special' ? '🎯 ' + c : c}</span>`).join('') : ''}
-            </div>
+            ${classDisplay}
+            ${coordinatorBadge}
         `;
         grid.appendChild(card);
     }
@@ -428,14 +517,23 @@ function renderTeachersTable() {
         container.innerHTML = '<p class="empty-state">কোনো শিক্ষক নেই</p>';
         return;
     }
-    let html = `<div class="table-responsive"><table><thead><tr><th>ছবি</th><th>নাম</th><th>আইডি</th><th>ক্লাস</th><th>অ্যাকশন</th></tr></thead><tbody>`;
+    let html = `<div class="table-responsive"><table><thead><tr><th>ছবি</th><th>নাম</th><th>আইডি</th><th>ক্লাস</th><th>রোল</th><th>অ্যাকশন</th></tr></thead><tbody>`;
     for (let key in allTeachers) {
         const t = allTeachers[key];
+        const isCoordinator = t.isOfficeCoordinator || false;
+        const roleText = isCoordinator ? 
+            '<span style="color:#ffd700;font-weight:700;"><i class="fas fa-user-tie"></i> Coordinator</span>' : 
+            'শিক্ষক';
+        const classText = isCoordinator ? 
+            '<span style="color:rgba(255,255,255,0.4);font-style:italic;">কোন ক্লাস নেই</span>' : 
+            (t.classes ? t.classes.map(c => c === 'SSC Special' ? '🎯 ' + c : c).join(', ') : '-');
+        
         html += `<tr>
             <td><img src="${t.image || 'https://ui-avatars.com/api/?background=1e7b4a&color=fff&name=' + encodeURIComponent(t.name)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;"></td>
             <td>${t.name}</td>
             <td>${t.id}</td>
-            <td>${t.classes ? t.classes.map(c => c === 'SSC Special' ? '🎯 ' + c : c).join(', ') : ''}</td>
+            <td>${classText}</td>
+            <td>${roleText}</td>
             <td><button class="btn btn-red btn-sm" onclick="deleteTeacher('${key}')">মুছুন</button></td>
         </tr>`;
     }
@@ -449,7 +547,112 @@ window.deleteTeacher = function(key) {
     }
 };
 
-// --- Class Buttons ---
+// ============================================================
+// POPULATE CLASS CHECKBOXES
+// ============================================================
+function populateClassCheckboxes() {
+    const container = document.getElementById('classCheckboxes');
+    if (!container) return;
+    container.innerHTML = `
+        <p style="font-size:13px; margin-bottom:8px; color:white;">
+            <strong>ক্লাস নির্বাচন করুন:</strong> 
+            <span style="font-size:11px; color:rgba(255,255,255,0.4);">(Office Coordinator হলে ক্লাস নির্বাচন না করলেও চলবে)</span>
+        </p>
+    `;
+    allClasses.forEach(cls => {
+        const displayName = cls === 'SSC Special' ? '🎯 ' + cls : cls;
+        const label = document.createElement('label');
+        label.style.cssText = 'display:inline-block; margin-right:12px; font-size:13px; color:rgba(255,255,255,0.8);';
+        label.innerHTML = `<input type="checkbox" class="teacher-class-checkbox" value="${cls}"> ${displayName}`;
+        container.appendChild(label);
+    });
+}
+
+// ============================================================
+// ADD TEACHER - WITH OFFICE COORDINATOR
+// ============================================================
+document.getElementById('createTeacherBtn').addEventListener('click', () => {
+    const name = document.getElementById('newTeacherName').value.trim();
+    const id = document.getElementById('newTeacherId').value.trim();
+    const password = document.getElementById('newTeacherPass').value.trim();
+    const checkboxes = document.querySelectorAll('.teacher-class-checkbox:checked');
+    const classes = Array.from(checkboxes).map(cb => cb.value);
+    const isOfficeCoordinator = document.getElementById('isOfficeCoordinator').checked;
+    
+    if (!name || !id || !password) {
+        alert('নাম, আইডি এবং পাসওয়ার্ড দিন');
+        return;
+    }
+    
+    if (!isOfficeCoordinator && classes.length === 0) {
+        alert('কমপক্ষে একটি ক্লাস নির্বাচন করুন');
+        return;
+    }
+    
+    const newTeacher = {
+        name: name,
+        id: id,
+        password: password,
+        classes: isOfficeCoordinator ? [] : classes,
+        image: document.getElementById('teacherImagePreview').src,
+        isOfficeCoordinator: isOfficeCoordinator,
+        role: isOfficeCoordinator ? 'Office Coordinator' : 'Teacher'
+    };
+    
+    const newRef = db.ref('teachers').push();
+    newRef.set(newTeacher).then(() => {
+        document.getElementById('newTeacherName').value = '';
+        document.getElementById('newTeacherId').value = '';
+        document.getElementById('newTeacherPass').value = '';
+        document.querySelectorAll('.teacher-class-checkbox:checked').forEach(cb => cb.checked = false);
+        document.getElementById('isOfficeCoordinator').checked = false;
+        alert('✅ শিক্ষক যোগ করা হয়েছে' + (isOfficeCoordinator ? ' (Office Coordinator)' : ''));
+    }).catch((error) => {
+        alert('❌ যোগ করতে সমস্যা হয়েছে: ' + error.message);
+    });
+});
+
+document.getElementById('teacherImageInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            document.getElementById('teacherImagePreview').src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// ============================================================
+// RENDER TEACHER PROFILE
+// ============================================================
+function renderTeacherProfile(teacherData) {
+    const container = document.getElementById('teacherProfileArea');
+    if (!container) return;
+    const isCoordinator = teacherData.isOfficeCoordinator || false;
+    const coordinatorBadge = isCoordinator ? 
+        '<span style="background:linear-gradient(135deg,#ffd700,#f5a623); color:#191970; padding:4px 18px; border-radius:30px; font-size:13px; font-weight:700; display:inline-block; margin-top:6px;"><i class="fas fa-user-tie"></i> Office Coordinator</span>' : '';
+    
+    const classDisplay = isCoordinator ? 
+        '<p style="color:rgba(255,255,255,0.5); font-style:italic;">কোন ক্লাস নেই (Coordinator)</p>' : 
+        `<p style="color:rgba(255,255,255,0.8);"><strong>ক্লাস:</strong> ${teacherData.classes ? teacherData.classes.map(c => c === 'SSC Special' ? '🎯 SSC Special' : c).join(', ') : ''}</p>`;
+    
+    container.innerHTML = `
+        <div style="display:flex; align-items:center; gap:20px; background:rgba(255,255,255,0.05); padding:20px; border-radius:20px; flex-wrap:wrap;">
+            <img src="${teacherData.image || 'https://ui-avatars.com/api/?background=1e7b4a&color=fff&name=' + encodeURIComponent(teacherData.name)}" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid #ffd700;">
+            <div>
+                <h3 style="border:none; padding:0; color:white; font-size:24px;">${teacherData.name}</h3>
+                <p style="color:rgba(255,255,255,0.8);"><strong>আইডি:</strong> ${teacherData.id}</p>
+                ${classDisplay}
+                ${coordinatorBadge}
+            </div>
+        </div>
+    `;
+}
+
+// ============================================================
+// CLASS BUTTONS
+// ============================================================
 function renderClassButtons() {
     const container = document.getElementById('classButtons');
     if (!container) return;
@@ -470,7 +673,9 @@ function renderClassButtons() {
     container.innerHTML += '</div>';
 }
 
-// --- Class Students ---
+// ============================================================
+// CLASS STUDENTS
+// ============================================================
 function renderClassStudents(className) {
     const container = document.getElementById('classStudentsTable');
     if (!container) return;
@@ -516,7 +721,9 @@ window.deleteStudent = function(key) {
     }
 };
 
-// --- Add Student ---
+// ============================================================
+// ADD STUDENT
+// ============================================================
 document.getElementById('addCousinBtn').addEventListener('click', () => {
     const name = document.getElementById('cousinName').value.trim();
     const id = document.getElementById('cousinId').value.trim();
@@ -575,65 +782,9 @@ document.getElementById('studentImageInput').addEventListener('change', function
     }
 });
 
-// --- Add Teacher ---
-function populateClassCheckboxes() {
-    const container = document.getElementById('classCheckboxes');
-    if (!container) return;
-    container.innerHTML = '<p style="font-size:13px; margin-bottom:8px; color:white;"><strong>ক্লাস নির্বাচন করুন:</strong></p>';
-    allClasses.forEach(cls => {
-        const displayName = cls === 'SSC Special' ? '🎯 ' + cls : cls;
-        const label = document.createElement('label');
-        label.style.cssText = 'display:inline-block; margin-right:12px; font-size:13px; color:rgba(255,255,255,0.8);';
-        label.innerHTML = `<input type="checkbox" class="teacher-class-checkbox" value="${cls}"> ${displayName}`;
-        container.appendChild(label);
-    });
-}
-
-document.getElementById('createTeacherBtn').addEventListener('click', () => {
-    const name = document.getElementById('newTeacherName').value.trim();
-    const id = document.getElementById('newTeacherId').value.trim();
-    const password = document.getElementById('newTeacherPass').value.trim();
-    const checkboxes = document.querySelectorAll('.teacher-class-checkbox:checked');
-    const classes = Array.from(checkboxes).map(cb => cb.value);
-    if (!name || !id || !password) {
-        alert('নাম, আইডি এবং পাসওয়ার্ড দিন');
-        return;
-    }
-    if (classes.length === 0) {
-        alert('কমপক্ষে একটি ক্লাস নির্বাচন করুন');
-        return;
-    }
-    const newTeacher = {
-        name: name,
-        id: id,
-        password: password,
-        classes: classes,
-        image: document.getElementById('teacherImagePreview').src
-    };
-    const newRef = db.ref('teachers').push();
-    newRef.set(newTeacher).then(() => {
-        document.getElementById('newTeacherName').value = '';
-        document.getElementById('newTeacherId').value = '';
-        document.getElementById('newTeacherPass').value = '';
-        document.querySelectorAll('.teacher-class-checkbox:checked').forEach(cb => cb.checked = false);
-        alert('✅ শিক্ষক যোগ করা হয়েছে');
-    }).catch((error) => {
-        alert('❌ যোগ করতে সমস্যা হয়েছে: ' + error.message);
-    });
-});
-
-document.getElementById('teacherImageInput').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            document.getElementById('teacherImagePreview').src = event.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-});
-
-// --- Routine Functions ---
+// ============================================================
+// ROUTINE FUNCTIONS
+// ============================================================
 function renderTodayTomorrowRoutine() {
     const container = document.getElementById('todayTomorrowRoutine');
     if (!container) return;
@@ -648,7 +799,6 @@ function renderTodayTomorrowRoutine() {
     
     let html = '<div class="routine-side-by-side">';
     
-    // Today Routine
     html += `<div class="today-routine-card">
         <h3><span class="icon">📅</span> আজকের রুটিন <span class="today-date">(${todayBangla})</span></h3>`;
     let hasToday = false;
@@ -683,7 +833,6 @@ function renderTodayTomorrowRoutine() {
     }
     html += '</div>';
     
-    // Tomorrow Routine
     html += `<div class="tomorrow-routine-card">
         <h3><span class="icon">🌅</span> আগামীকালের রুটিন <span class="tomorrow-date">(${tomorrowBangla})</span></h3>`;
     let hasTomorrow = false;
@@ -817,7 +966,6 @@ function renderRoutineEditor() {
     html += `</tbody></table></div></div>`;
     container.innerHTML = html;
     
-    // Event listeners for auto-save
     document.querySelectorAll('.routine-group-input').forEach(input => {
         input.addEventListener('input', function() {
             const className = this.dataset.class;
@@ -858,28 +1006,48 @@ function renderRoutineEditor() {
 function renderRoutineModal() {
     const container = document.getElementById('routineContent');
     if (!container) return;
-    
+
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const banglaDays = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
     const today = new Date();
     const todayName = days[today.getDay()];
-    
-    let html = `<div class="table-responsive"><table class="routine-table"><thead><tr><th>ক্লাস</th><th>গ্রুপ</th>`;
-    days.forEach(day => {
-        html += `<th>${day}</th>`;
+
+    let html = `<div class="table-responsive">
+        <table class="routine-table">
+            <thead>
+                <tr>
+                    <th>ক্লাস</th>
+                    <th>গ্রুপ</th>`;
+
+    days.forEach((day, index) => {
+        const isToday = day === todayName;
+        html += `<th style="${isToday ? 'color:#ffd700; font-weight:800;' : ''}">${banglaDays[index]}${isToday ? ' 📌' : ''}</th>`;
     });
-    html += '</tr></thead><tbody>';
-    
-    allClasses.forEach(cls => {
+
+    html += `</tr></thead><tbody>`;
+
+    const sortedClasses = [...allClasses];
+    sortedClasses.sort((a, b) => {
+        if (a === 'SSC Special') return -1;
+        if (b === 'SSC Special') return 1;
+        return a.localeCompare(b);
+    });
+
+    sortedClasses.forEach(cls => {
         if (isGroupRequired(cls)) {
             GROUP_LIST.forEach(grp => {
                 const key = cls + '_' + grp;
                 const icon = GROUP_ICONS[grp] || '';
                 const isSscSpecial = cls === 'SSC Special';
-                html += `<tr><td><strong>${isSscSpecial ? '🎯 ' + cls : cls}</strong></td><td><span class="${isSscSpecial ? 'ssc-special-badge' : 'student-group-tag ' + grp.toLowerCase()}">${isSscSpecial ? '🎯 ' + icon + ' ' + grp : icon + ' ' + grp}</span></td>`;
+                const groupTagClass = isSscSpecial ? 'ssc-special' : grp.toLowerCase();
+                
+                html += `<tr><td><strong>${isSscSpecial ? '🎯 ' + cls : cls}</strong></td>
+                    <td><span class="routine-group-tag ${groupTagClass}">${isSscSpecial ? '🎯 ' + icon + ' ' + grp : icon + ' ' + grp}</span></td>`;
+                
                 days.forEach(day => {
                     const val = allRoutines[day] && allRoutines[day][key] ? allRoutines[day][key] : '-';
                     const isToday = day === todayName;
-                    html += `<td style="${isToday ? 'background:rgba(255,215,0,0.1); font-weight:bold;' : ''}">${val}</td>`;
+                    html += `<td style="${isToday ? 'background:rgba(255,215,0,0.08); font-weight:600; color:#ffd700;' : ''}">${val}</td>`;
                 });
                 html += '</tr>';
             });
@@ -888,12 +1056,12 @@ function renderRoutineModal() {
             days.forEach(day => {
                 const val = allRoutines[day] && allRoutines[day][cls] ? allRoutines[day][cls] : '-';
                 const isToday = day === todayName;
-                html += `<td style="${isToday ? 'background:rgba(255,215,0,0.1); font-weight:bold;' : ''}">${val}</td>`;
+                html += `<td style="${isToday ? 'background:rgba(255,215,0,0.08); font-weight:600; color:#ffd700;' : ''}">${val}</td>`;
             });
             html += '</tr>';
         }
     });
-    
+
     html += '</tbody></table></div>';
     container.innerHTML = html;
 }
@@ -995,7 +1163,9 @@ function renderStudentOwnRoutine() {
     container.innerHTML = html;
 }
 
-// --- Populate Selects ---
+// ============================================================
+// POPULATE SELECTS
+// ============================================================
 function populateAttendanceClassSelect() {
     const classSelect = document.getElementById('attendanceClassSelect');
     if (!classSelect) return;
@@ -1032,7 +1202,9 @@ function populateRoutineClassSelect() {
     selectedRoutineClass = classSelect.value;
 }
 
-// --- Routine Select Changes ---
+// ============================================================
+// ROUTINE SELECT CHANGES
+// ============================================================
 document.getElementById('routineClassSelect')?.addEventListener('change', function() {
     selectedRoutineClass = this.value;
     renderRoutineEditor();
@@ -1047,7 +1219,9 @@ document.getElementById('routineGroupSelect')?.addEventListener('change', functi
     renderRoutineEditor();
 });
 
-// --- UI Setup ---
+// ============================================================
+// UI SETUP
+// ============================================================
 function setupAdminUI() {
     document.getElementById('menuClassManager').style.display = 'block';
     document.getElementById('menuTeachers').style.display = 'block';
@@ -1088,7 +1262,9 @@ function setupStudentUI(studentData) {
     setupAttendance();
 }
 
-// --- Panel Navigation ---
+// ============================================================
+// PANEL NAVIGATION
+// ============================================================
 function showPanel(panelId) {
     document.querySelectorAll('.panel').forEach(p => {
         p.classList.remove('active-panel', 'active');
@@ -1163,22 +1339,9 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// --- Teacher Profile ---
-function renderTeacherProfile(teacherData) {
-    const container = document.getElementById('teacherProfileArea');
-    if (!container) return;
-    container.innerHTML = `
-        <div style="display:flex; align-items:center; gap:20px; background:rgba(255,255,255,0.05); padding:20px; border-radius:20px; flex-wrap:wrap;">
-            <img src="${teacherData.image || 'https://ui-avatars.com/api/?background=1e7b4a&color=fff&name=' + encodeURIComponent(teacherData.name)}" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid #ffd700;">
-            <div>
-                <h3 style="border:none; padding:0; color:white; font-size:24px;">${teacherData.name}</h3>
-                <p style="color:rgba(255,255,255,0.8);"><strong>আইডি:</strong> ${teacherData.id}</p>
-                <p style="color:rgba(255,255,255,0.8);"><strong>ক্লাস:</strong> ${teacherData.classes ? teacherData.classes.map(c => c === 'SSC Special' ? '🎯 SSC Special' : c).join(', ') : ''}</p>
-            </div>
-        </div>
-    `;
-}
-
+// ============================================================
+// TEACHER ASSIGNED CLASSES
+// ============================================================
 function renderTeacherAssignedClasses(teacherData) {
     const container = document.getElementById('teacherAssignedClasses');
     if (!container) return;
@@ -1229,7 +1392,9 @@ function renderTeacherClassStudents(className) {
     container.innerHTML = html;
 }
 
-// --- Student Info ---
+// ============================================================
+// STUDENT INFO
+// ============================================================
 function renderStudentInfo(studentData) {
     const card = document.getElementById('studentClassInfo');
     if (!card || !studentData) return;
@@ -1243,7 +1408,9 @@ function renderStudentInfo(studentData) {
     renderStudentOwnRoutine();
 }
 
-// --- Attendance ---
+// ============================================================
+// ATTENDANCE
+// ============================================================
 function setupAttendance() {
     const dateInput = document.getElementById('attendanceDate');
     if (dateInput) {
@@ -1359,7 +1526,9 @@ document.getElementById('saveAttendanceBtn').addEventListener('click', () => {
     alert('✅ উপস্থিতি সংরক্ষণ করা হয়েছে');
 });
 
-// --- Student Attendance ---
+// ============================================================
+// STUDENT ATTENDANCE
+// ============================================================
 function renderStudentAttendance() {
     if (!currentUserKey || !allStudents[currentUserKey]) return;
     const student = allStudents[currentUserKey];
@@ -1437,7 +1606,9 @@ window.changeStudentMonth = function(delta) {
     renderStudentAttendance();
 };
 
-// --- Class Monthly Calendar ---
+// ============================================================
+// CLASS MONTHLY CALENDAR
+// ============================================================
 function renderClassMonthlyCalendar() {
     const container = document.getElementById('classMonthlyCalendar');
     const monthSelector = document.getElementById('classMonthSelector');
@@ -1532,7 +1703,9 @@ window.changeClassMonth = function(delta) {
     renderClassMonthlyCalendar();
 };
 
-// --- Feedback ---
+// ============================================================
+// FEEDBACK
+// ============================================================
 function renderStudentFeedbackArea() {
     const container = document.getElementById('studentFeedbackArea');
     if (!container) return;
@@ -1650,7 +1823,9 @@ function renderFeedbackList() {
     container.innerHTML = html;
 }
 
-// --- Social Feed ---
+// ============================================================
+// SOCIAL FEED
+// ============================================================
 document.getElementById('feedImageInput')?.addEventListener('change', function(e) {
     const files = e.target.files;
     const container = document.getElementById('imagePreviewContainer');
@@ -1832,17 +2007,37 @@ window.deletePost = function(postKey) {
     }
 };
 
-// --- View Buttons ---
-document.getElementById('viewRoutineBtn')?.addEventListener('click', () => {
-    document.getElementById('routineModal').style.display = 'flex';
-    renderRoutineModal();
+// ============================================================
+// VIEW BUTTONS - NEW PAGE যাবে না
+// ============================================================
+document.getElementById('viewRoutineBtn')?.addEventListener('click', function(e) {
+    e.preventDefault();
+    const routineSection = document.getElementById('fullRoutineDisplay');
+    if (routineSection) {
+        routineSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        routineSection.style.transition = 'box-shadow 0.5s ease';
+        routineSection.style.boxShadow = '0 0 40px rgba(255, 215, 0, 0.2)';
+        setTimeout(() => {
+            routineSection.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.15)';
+        }, 1500);
+    }
+    renderFullRoutine();
 });
 
-document.getElementById('viewResultBtn')?.addEventListener('click', () => {
+// ============================================================
+// VIEW RESULT BUTTON - একই পেজে Modal খুলবে (New Page যাবে না)
+// ============================================================
+document.getElementById('viewResultBtn')?.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
     document.getElementById('resultModal').style.display = 'flex';
 });
 
-document.getElementById('aboutUsBtn')?.addEventListener('click', () => {
+// ============================================================
+// ABOUT BUTTON - একই পেজে Modal খুলবে
+// ============================================================
+document.getElementById('aboutUsBtn')?.addEventListener('click', function(e) {
+    e.preventDefault();
     document.getElementById('aboutModal').style.display = 'flex';
 });
 
@@ -1851,9 +2046,13 @@ document.getElementById('saveClassBtn')?.addEventListener('click', () => {
 });
 
 // ============================================================
-// AUTO LOGIN CHECK
+// INITIALIZE ON DOM READY
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
+    // Animate GLORIOUS text
+    setTimeout(animateGloriousText, 100);
+    
+    // Check session
     const hasSession = checkSession();
     if (!hasSession) {
         loginScreen.style.display = 'flex';
@@ -1863,4 +2062,6 @@ document.addEventListener('DOMContentLoaded', function() {
 console.log('📚 GLORIOUS Education Care সিস্টেম লোড হয়েছে');
 console.log('🔥 Firebase Connected');
 console.log('✅ অটো-সেভ সক্রিয় আছে');
-console.log('✅ SSC Special ক্লাসের জন্য গ্রুপ বাধ্যতামূলক করা হয়েছে');
+console.log('✅ Office Coordinator ফিচার যোগ করা হয়েছে');
+console.log('✅ GLORIOUS টেক্সট 8টি রঙে ও Wave Rotate এ সাজানো');
+console.log('✅ "ফলাফল দেখুন" নতুন পেজে যায় না - same browser tab takbe');
