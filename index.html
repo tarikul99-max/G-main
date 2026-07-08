@@ -40,13 +40,13 @@
 <!-- ==================== APP CONTAINER ==================== -->
 <div id="appContainer" class="app-container">
     
-    <!-- ==================== NAVBAR - FIXED & LARGER ==================== -->
+    <!-- ==================== NAVBAR ==================== -->
     <nav class="navbar" id="mainNavbar">
         <div class="logo-area">
             <img src="logo.jpeg" alt="Logo">
             <div class="brand-text">
                 <h1>GLORIOUS</h1>
-                <span class="edu-text">Education Care</span>
+                <span class="edu-text">Education <span class="care">Care</span></span>
             </div>
         </div>
         <div class="user-area">
@@ -83,9 +83,6 @@
                 <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                     <button class="btn btn-blue" id="aboutUsBtn">
                         <i class="fas fa-info-circle"></i> সম্পর্কে
-                    </button>
-                    <button class="btn btn-green" id="viewRoutineBtn">
-                        <i class="fas fa-calendar-week"></i> রুটিন দেখুন
                     </button>
                 </div>
             </div>
@@ -130,6 +127,21 @@
                     </p>
                 </div>
             </div>
+            
+            <!-- ==================== FULL ROUTINE SECTION ==================== -->
+            <div style="margin-top: 40px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 20px;">
+                    <h2 style="margin: 0; border-left: 5px solid #FFD700; padding-left: 20px;">
+                        <i class="fas fa-calendar-week"></i> সম্পূর্ণ ক্লাস রুটিন
+                    </h2>
+                    <button class="btn btn-green" id="viewRoutineBtn" style="padding: 12px 30px; font-size: 16px;">
+                        <i class="fas fa-expand"></i> রুটিন দেখুন
+                    </button>
+                </div>
+                <div id="fullRoutineDisplay" class="routine-full-container">
+                    <!-- Full routine will be displayed here -->
+                </div>
+            </div>
         </div>
         
         <!-- ==================== STUDENT FEEDBACK PANEL ==================== -->
@@ -157,7 +169,18 @@
                 <input type="text" id="newTeacherName" placeholder="পূর্ণ নাম">
                 <input type="text" id="newTeacherId" placeholder="শিক্ষক আইডি">
                 <input type="text" id="newTeacherPass" placeholder="পাসওয়ার্ড">
-                <div id="classCheckboxes"></div>
+                
+                <div id="classCheckboxes">
+                    <p style="font-size:13px; margin-bottom:8px; color:white;"><strong>ক্লাস নির্বাচন করুন:</strong> <span style="font-size:11px; color:rgba(255,255,255,0.4);">(Office Coordinator হলে ক্লাস নির্বাচন না করলেও চলবে)</span></p>
+                </div>
+                
+                <div style="margin: 10px 0; padding: 12px 16px; background: rgba(255,215,0,0.05); border-radius: 16px; border: 1px solid rgba(255,215,0,0.1);">
+                    <label style="display: flex; align-items: center; gap: 10px; color: white; cursor: pointer; font-size: 15px;">
+                        <input type="checkbox" id="isOfficeCoordinator" style="width: 20px; height: 20px; margin: 0; cursor: pointer;">
+                        <span><i class="fas fa-user-tie" style="color: #ffd700; margin-right: 8px;"></i> <strong>Office Coordinator</strong> <span style="font-size:12px; color:rgba(255,255,255,0.5);">(অফিস কো-অর্ডিনেটর)</span></span>
+                    </label>
+                </div>
+                
                 <button class="btn btn-green" id="createTeacherBtn">শিক্ষক যোগ করুন</button>
             </div>
             <h3>📋 শিক্ষকবৃন্দ</h3>
@@ -294,26 +317,52 @@
 
 <!-- ==================== MODALS ==================== -->
 
-<!-- ==================== RESULT MODAL ==================== -->
+<!-- ==================== RESULT MODAL - একই পেজে ==================== -->
 <div id="resultModal" class="result-modal" onclick="closeModalOutside(event, 'resultModal')">
     <div class="results-card" onclick="event.stopPropagation()">
+        <button onclick="document.getElementById('resultModal').style.display='none'" 
+                style="position:absolute; top:15px; right:20px; background:none; border:none; color:rgba(255,255,255,0.5); font-size:28px; cursor:pointer; transition:0.3s; z-index:10;">
+            <i class="fas fa-times"></i>
+        </button>
+        
         <div style="position:relative; display:inline-block; margin-bottom:15px;">
             <div style="position:absolute; top:-10px; left:-10px; right:-10px; bottom:-10px; background:radial-gradient(circle, rgba(255,215,0,0.1), transparent 70%); border-radius:50%;"></div>
             <i class="fas fa-chart-simple" style="font-size:65px; color:#ffd700; position:relative; z-index:1; text-shadow:0 0 40px rgba(255,215,0,0.3);"></i>
         </div>
-        <h2>📊 একাডেমিক ফলাফল</h2>
+        
+        <h2 style="color:#fff; font-size:28px; font-weight:800; margin-bottom:8px;">📊 একাডেমিক ফলাফল</h2>
         <div style="width:100px; height:4px; background:linear-gradient(90deg, #ffd700, #f5a623); margin:12px auto; border-radius:5px;"></div>
-        <div style="margin:25px 0;">
-            <a href="about.html" target="_blank" style="display:inline-block; background: linear-gradient(135deg, #ffd700, #f5a623); color: #191970; padding: 16px 45px; border-radius: 60px; text-decoration: none; font-weight: 800; font-size: 20px; box-shadow: 0 4px 30px rgba(255, 215, 0, 0.3); transition:all 0.3s ease;">
-                <i class="fas fa-external-link-alt" style="margin-right:10px;"></i> ফলাফল দেখুন
-            </a>
+        
+        <div style="margin:20px 0; text-align:left; background:rgba(255,255,255,0.05); border-radius:16px; padding:20px; border:1px solid rgba(255,255,255,0.05);">
+            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                <span style="color:rgba(255,255,255,0.6);">📚 পরীক্ষা</span>
+                <span style="color:#ffd700; font-weight:700;">প্রকাশিত হবে</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+                <span style="color:rgba(255,255,255,0.6);">📅 তারিখ</span>
+                <span style="color:#fff;">শীঘ্রই</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:10px 0;">
+                <span style="color:rgba(255,255,255,0.6);">⭐ অবস্থা</span>
+                <span style="color:#48DBFB; font-weight:700;">✅ অপেক্ষমাণ</span>
+            </div>
         </div>
+        
         <div style="background:rgba(255,255,255,0.05); border-radius:16px; padding:15px; margin:15px 0; border:1px solid rgba(255,255,255,0.05);">
-            <p style="margin:5px 0; font-size:16px; color:rgba(255,255,255,0.9);"><i class="fas fa-info-circle" style="color:#ffd700; margin-right:8px;"></i> আপনার পরীক্ষার ফলাফল এখানে প্রকাশিত হবে।</p>
-            <p style="margin:5px 0; font-size:14px; color:rgba(255,255,255,0.7);"><i class="fas fa-exclamation-circle" style="color:#f5b042; margin-right:8px;"></i> ফলাফল নিয়ে যেকোনো অভিযোগ অফিসে জানান।</p>
+            <p style="margin:5px 0; font-size:16px; color:rgba(255,255,255,0.9);">
+                <i class="fas fa-info-circle" style="color:#ffd700; margin-right:8px;"></i> 
+                আপনার পরীক্ষার ফলাফল এখানে প্রকাশিত হবে।
+            </p>
+            <p style="margin:5px 0; font-size:14px; color:rgba(255,255,255,0.7);">
+                <i class="fas fa-exclamation-circle" style="color:#f5b042; margin-right:8px;"></i> 
+                ফলাফল নিয়ে যেকোনো অভিযোগ অফিসে জানান।
+            </p>
         </div>
+        
         <p style="margin:20px 0 25px; font-style:italic; font-size:22px; color:#ffd700; font-weight:700; text-shadow:0 0 30px rgba(255,215,0,0.1);">❝ ধন্যবাদ ❞</p>
-        <button onclick="document.getElementById('resultModal').style.display='none'" style="background:rgba(255,255,255,0.05); color:white; padding:12px 35px; border:1px solid rgba(255,255,255,0.1); border-radius:50px; font-weight:600; font-size:16px; cursor:pointer; transition:all 0.3s ease;">
+        
+        <button onclick="document.getElementById('resultModal').style.display='none'" 
+                style="background:rgba(255,255,255,0.05); color:white; padding:12px 35px; border:1px solid rgba(255,255,255,0.1); border-radius:50px; font-weight:600; font-size:16px; cursor:pointer; transition:all 0.3s ease;">
             <i class="fas fa-times" style="margin-right:8px;"></i> বন্ধ করুন
         </button>
     </div>
@@ -322,8 +371,12 @@
 <!-- ==================== ABOUT MODAL ==================== -->
 <div id="aboutModal" class="about-modal" onclick="closeModalOutside(event, 'aboutModal')">
     <div class="about-card" onclick="event.stopPropagation()">
+        <button onclick="document.getElementById('aboutModal').style.display='none'" 
+                style="position:absolute; top:15px; right:20px; background:none; border:none; color:rgba(255,255,255,0.5); font-size:28px; cursor:pointer; transition:0.3s;">
+            <i class="fas fa-times"></i>
+        </button>
         <i class="fas fa-school" style="font-size:48px; color:#ffd700; display:block; text-align:center;"></i>
-        <h2>GLORIOUS EDUCATION CARE</h2>
+        <h2 style="color:#fff;">GLORIOUS EDUCATION CARE</h2>
         <p style="margin:15px 0; color:rgba(255,255,255,0.9); font-size:16px; line-height:1.7;">আধুনিক শিক্ষাপ্রতিষ্ঠান যা মানসম্মত শিক্ষা ও প্রযুক্তিনির্ভর ক্লাসরুম ব্যবস্থাপনায় অনন্য।</p>
         <p style="color:rgba(255,255,255,0.8);"><strong>📍 ঠিকানা:</strong> পেকুয়া, কক্সবাজার</p>
         <p style="color:rgba(255,255,255,0.8);"><strong>📞 যোগাযোগ:</strong> +8801XXXXXXXX</p>
@@ -335,7 +388,7 @@
 <div id="routineModal" class="routine-modal" onclick="closeModalOutside(event, 'routineModal')">
     <div class="routine-card" onclick="event.stopPropagation()">
         <i class="fas fa-calendar-week" style="font-size:48px; color:#ffd700; display:block; text-align:center;"></i>
-        <h2>📅 ক্লাস রুটিন</h2>
+        <h2 style="color:#fff;">📅 ক্লাস রুটিন</h2>
         <div id="routineContent"></div>
         <button class="btn btn-orange" onclick="document.getElementById('routineModal').style.display='none'" style="margin-top:15px; padding:12px 30px;">বন্ধ করুন</button>
     </div>
@@ -349,7 +402,7 @@
 <!-- Main Application Script -->
 <script src="script.js"></script>
 
-<!-- Lightweight Background (CSS Animation) - No Three.js needed! -->
+<!-- Lightweight Background -->
 <script src="lightweight-bg.js"></script>
 
 </body>
