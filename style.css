@@ -24,7 +24,7 @@ body {
     position: relative;
 }
 
-/* ==================== 3D CANVAS BACKGROUND ==================== */
+/* ==================== LIGHTWEIGHT BACKGROUND ==================== */
 #canvas-container {
     position: fixed;
     top: 0;
@@ -33,12 +33,7 @@ body {
     height: 100%;
     z-index: 1;
     pointer-events: none;
-}
-
-#canvas-container canvas {
-    display: block;
-    width: 100% !important;
-    height: 100% !important;
+    overflow: hidden;
 }
 
 /* ==================== BACKGROUND DECORATION ==================== */
@@ -73,12 +68,14 @@ body::before {
     z-index: 100;
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     padding: 16px;
 }
 
 .login-card {
     background: linear-gradient(145deg, rgba(0, 100, 0, 0.15), rgba(255, 215, 0, 0.05));
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     padding: 35px 28px;
     border-radius: 50px;
     width: 100%;
@@ -100,8 +97,8 @@ body::before {
     background: linear-gradient(90deg, #FFD700, #FF6B6B, #48DBFB, #FFD700);
     background-size: 300% 100%;
     -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     background-clip: text;
-    color: transparent;
     animation: rainbowMove 4s linear infinite;
 }
 
@@ -119,6 +116,7 @@ body::before {
     border-radius: 60px;
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
     font-size: 15px;
     color: white;
     transition: 0.3s;
@@ -180,10 +178,11 @@ body::before {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ==================== NAVBAR - FIXED & LARGER ==================== */
+/* ==================== NAVBAR ==================== */
 .navbar {
     background: rgba(0, 40, 22, 0.97);
     backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     color: white;
     padding: 18px 28px;
     display: flex;
@@ -230,48 +229,132 @@ body::before {
     border: 2px solid rgba(255, 215, 0, 0.2);
     box-shadow: 0 4px 20px rgba(255, 215, 0, 0.15);
     transition: transform 0.3s ease;
+    object-fit: cover;
 }
 
 .logo-area img:hover {
     transform: rotate(-5deg) scale(1.05);
 }
 
-.logo-area h1 {
+/* ==================== BRAND TEXT - WAVE ROTATE FROM POSITION ==================== */
+.brand-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.1;
+}
+
+.brand-text h1 {
+    display: flex;
+    gap: 2px;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
     font-size: 32px;
     font-weight: 900;
-    margin: 0;
-    letter-spacing: 2px;
-    background: linear-gradient(90deg, 
-        #FF6B6B, #FF9F43, #FECA57, #48DBFB, 
-        #0ABDE3, #10AC84, #EE5A24, #FF6B6B);
-    background-size: 300% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    animation: rainbowMove 4s linear infinite;
-    text-shadow: 0 0 40px rgba(255, 215, 0, 0.1);
     position: relative;
 }
 
-.logo-area h1::after {
-    content: 'GLORIOUS';
-    position: absolute;
-    top: 0;
-    left: 0;
-    background: linear-gradient(90deg, 
-        #FF6B6B, #FF9F43, #FECA57, #48DBFB, 
-        #0ABDE3, #10AC84, #EE5A24, #FF6B6B);
-    background-size: 300% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    animation: rainbowMove 4s linear infinite;
-    filter: blur(20px);
-    opacity: 0.3;
-    z-index: -1;
+.brand-text h1 .letter {
+    display: inline-block;
+    font-weight: 900;
+    font-size: inherit;
+    transform-origin: center center;
+    transition: transform 0.3s ease, color 0.3s ease;
+    position: relative;
 }
 
-.logo-area .edu-text {
+/* প্রতিটি অক্ষরের জন্য আলাদা রোটেশন + রঙ + পজিশন অফসেট */
+.brand-text h1 .letter:nth-child(1) { 
+    color: #FF6B6B;
+    transform: rotate(20deg) translateY(-3px);
+    text-shadow: 0 0 20px rgba(255,107,107,0.3);
+}
+.brand-text h1 .letter:nth-child(2) { 
+    color: #FF9F43;
+    transform: rotate(-14deg) translateY(2px);
+    text-shadow: 0 0 20px rgba(255,159,67,0.3);
+}
+.brand-text h1 .letter:nth-child(3) { 
+    color: #FECA57;
+    transform: rotate(8deg) translateY(-4px);
+    text-shadow: 0 0 20px rgba(254,202,87,0.3);
+}
+.brand-text h1 .letter:nth-child(4) { 
+    color: #48DBFB;
+    transform: rotate(-12deg) translateY(1px);
+    text-shadow: 0 0 20px rgba(72,219,251,0.3);
+}
+.brand-text h1 .letter:nth-child(5) { 
+    color: #0ABDE3;
+    transform: rotate(14deg) translateY(-2px);
+    text-shadow: 0 0 20px rgba(10,189,227,0.3);
+}
+.brand-text h1 .letter:nth-child(6) { 
+    color: #10AC84;
+    transform: rotate(-15deg) translateY(3px);
+    text-shadow: 0 0 20px rgba(16,172,132,0.3);
+}
+.brand-text h1 .letter:nth-child(7) { 
+    color: #EE5A24;
+    transform: rotate(16deg) translateY(-1px);
+    text-shadow: 0 0 20px rgba(238,90,36,0.3);
+}
+.brand-text h1 .letter:nth-child(8) { 
+    color: #FF6B6B;
+    transform: rotate(-20deg) translateY(2px);
+    text-shadow: 0 0 20px rgba(255,107,107,0.3);
+}
+
+/* প্রতিটি অক্ষরের জন্য আলাদা ট্রান্সফর্ম অরিজিন - ওয়েভ ইফেক্টের জন্য */
+.brand-text h1 .letter:nth-child(odd) {
+    transform-origin: center bottom;
+}
+
+.brand-text h1 .letter:nth-child(even) {
+    transform-origin: center top;
+}
+
+/* হভার ইফেক্ট - অক্ষরটি সোজা হয়ে বড় হয় */
+.brand-text h1 .letter:hover {
+    transform: rotate(0deg) scale(1.4) translateY(-5px) !important;
+    color: #FFD700 !important;
+    text-shadow: 0 0 30px rgba(255, 215, 0, 0.6) !important;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+/* মোবাইলে রোটেশন ও পজিশন কমিয়ে দেওয়া */
+@media (max-width: 768px) {
+    .brand-text h1 {
+        font-size: 26px;
+    }
+    .brand-text h1 .letter:nth-child(1) { transform: rotate(8deg) translateY(-2px); }
+    .brand-text h1 .letter:nth-child(2) { transform: rotate(-6deg) translateY(1px); }
+    .brand-text h1 .letter:nth-child(3) { transform: rotate(4deg) translateY(-2px); }
+    .brand-text h1 .letter:nth-child(4) { transform: rotate(-5deg) translateY(1px); }
+    .brand-text h1 .letter:nth-child(5) { transform: rotate(6deg) translateY(-1px); }
+    .brand-text h1 .letter:nth-child(6) { transform: rotate(-7deg) translateY(2px); }
+    .brand-text h1 .letter:nth-child(7) { transform: rotate(7deg) translateY(-1px); }
+    .brand-text h1 .letter:nth-child(8) { transform: rotate(-8deg) translateY(1px); }
+}
+
+@media (max-width: 480px) {
+    .brand-text h1 {
+        font-size: 22px;
+        gap: 1px;
+    }
+    .brand-text h1 .letter:nth-child(1) { transform: rotate(5deg) translateY(-1px); }
+    .brand-text h1 .letter:nth-child(2) { transform: rotate(-4deg) translateY(1px); }
+    .brand-text h1 .letter:nth-child(3) { transform: rotate(3deg) translateY(-1px); }
+    .brand-text h1 .letter:nth-child(4) { transform: rotate(-3deg) translateY(0px); }
+    .brand-text h1 .letter:nth-child(5) { transform: rotate(4deg) translateY(-1px); }
+    .brand-text h1 .letter:nth-child(6) { transform: rotate(-5deg) translateY(1px); }
+    .brand-text h1 .letter:nth-child(7) { transform: rotate(5deg) translateY(0px); }
+    .brand-text h1 .letter:nth-child(8) { transform: rotate(-6deg) translateY(1px); }
+}
+
+.brand-text .edu-text {
     font-size: 18px;
     font-weight: 700;
     letter-spacing: 1px;
@@ -279,20 +362,37 @@ body::before {
         #FECA57, #FF9F43, #FF6B6B, #FF9F43, #FECA57);
     background-size: 200% 100%;
     -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     background-clip: text;
-    color: transparent;
     animation: rainbowMove 3s ease-in-out infinite;
-    margin-left: 4px;
+    display: inline-block;
 }
 
-.logo-area .edu-text .care {
+.brand-text .edu-text .care {
     background: linear-gradient(90deg, 
         #48DBFB, #0ABDE3, #10AC84, #48DBFB);
     background-size: 200% 100%;
     -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     background-clip: text;
-    color: transparent;
     animation: rainbowMove 3.5s ease-in-out infinite;
+    display: inline-block;
+}
+
+/* Fallback for older browsers */
+@supports not (background-clip: text) {
+    .brand-text .edu-text {
+        color: #FECA57;
+        background: none;
+        -webkit-text-fill-color: #FECA57;
+        animation: none;
+    }
+    .brand-text .edu-text .care {
+        color: #48DBFB;
+        background: none;
+        -webkit-text-fill-color: #48DBFB;
+        animation: none;
+    }
 }
 
 /* ==================== USER AREA ==================== */
@@ -305,13 +405,13 @@ body::before {
     color: white;
 }
 
-.user-area #userNameDisplay {
+.user-area .user-name {
     font-weight: 700;
     font-size: 17px;
     color: #FFD700;
 }
 
-.user-area #roleDisplay {
+.user-area .user-role {
     font-size: 14px;
     color: rgba(255, 255, 255, 0.6);
     background: rgba(255, 255, 255, 0.08);
@@ -337,7 +437,6 @@ body::before {
     margin-right: 8px;
 }
 
-/* ==================== MENU BUTTON ==================== */
 .menu-btn {
     background: none;
     border: none;
@@ -367,6 +466,7 @@ body::before {
     top: 55px;
     background: linear-gradient(145deg, rgba(0, 50, 28, 0.98), rgba(26, 10, 46, 0.98));
     backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     min-width: 280px;
     border-radius: 24px;
     overflow: hidden;
@@ -442,6 +542,7 @@ body::before {
     display: none;
     background: rgba(0, 100, 0, 0.05);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-radius: 28px;
     padding: 24px 20px;
     margin-bottom: 25px;
@@ -476,6 +577,7 @@ body::before {
 #dashboardPanel {
     background: linear-gradient(145deg, rgba(0, 100, 0, 0.08), rgba(255, 215, 0, 0.05));
     backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     border-radius: 32px;
     padding: 32px 28px;
     margin-bottom: 30px;
@@ -529,6 +631,7 @@ body::before {
 .student-info-card {
     background: linear-gradient(145deg, rgba(0, 100, 0, 0.15), rgba(255, 215, 0, 0.08));
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     color: white;
     padding: 28px 32px;
     border-radius: 28px;
@@ -620,10 +723,6 @@ body::before {
     transition: background 0.2s ease;
 }
 
-.today-routine-card p:hover {
-    background: rgba(255, 255, 255, 0.15);
-}
-
 .tomorrow-routine-card {
     flex: 1;
     min-width: 340px;
@@ -671,10 +770,6 @@ body::before {
     transition: background 0.2s ease;
 }
 
-.tomorrow-routine-card p:hover {
-    background: rgba(255, 255, 255, 0.15);
-}
-
 @keyframes flashGradient {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
@@ -685,6 +780,7 @@ body::before {
 #studentOwnRoutine .routine-card {
     background: linear-gradient(145deg, rgba(0, 100, 0, 0.1), rgba(255, 215, 0, 0.06));
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-radius: 28px !important;
     padding: 32px 28px !important;
     border: 1px solid rgba(255, 215, 0, 0.1) !important;
@@ -792,6 +888,105 @@ body::before {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     font-size: 16px;
     line-height: 1.8;
+}
+
+/* ==================== FULL ROUTINE DISPLAY ==================== */
+.routine-full-container {
+    background: linear-gradient(145deg, rgba(0, 100, 0, 0.08), rgba(255, 215, 0, 0.04));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 28px;
+    padding: 24px 20px;
+    border: 1px solid rgba(255, 215, 0, 0.06);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    max-height: 600px;
+    overflow-y: auto;
+    position: relative;
+}
+
+.routine-full-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.routine-full-container::-webkit-scrollbar-track {
+    background: rgba(0, 100, 0, 0.03);
+    border-radius: 10px;
+}
+
+.routine-full-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 215, 0, 0.3);
+    border-radius: 10px;
+}
+
+.routine-full-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 215, 0, 0.5);
+}
+
+.routine-full-container .routine-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    min-width: 600px;
+}
+
+.routine-full-container .routine-table thead th {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 182, 193, 0.1));
+    color: #fff;
+    padding: 14px 12px;
+    font-weight: 700;
+    font-size: 14px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.routine-full-container .routine-table tbody td {
+    padding: 12px 10px;
+    border-bottom: 1px solid rgba(255, 215, 0, 0.06);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 13px;
+}
+
+.routine-full-container .routine-table tbody tr:hover td {
+    background: rgba(255, 215, 0, 0.04);
+}
+
+.routine-full-container .routine-table tbody tr.today-row td {
+    background: rgba(255, 215, 0, 0.08);
+    border-left: 3px solid #ffd700;
+}
+
+/* ==================== ROUTINE GROUP TAGS ==================== */
+.routine-group-tag {
+    display: inline-block;
+    padding: 3px 14px;
+    border-radius: 30px;
+    font-size: 11px;
+    font-weight: 700;
+    margin: 0 3px;
+}
+
+.routine-group-tag.science {
+    background: linear-gradient(135deg, #006400, #228B22);
+    color: #fff;
+}
+
+.routine-group-tag.commerce {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: #fff;
+}
+
+.routine-group-tag.arts {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    color: #fff;
+}
+
+.routine-group-tag.ssc-special {
+    background: linear-gradient(135deg, #006400, #228B22, #ffd700);
+    color: #fff;
+    animation: sscPulse 2s ease-in-out infinite;
 }
 
 /* ==================== BUTTONS ==================== */
@@ -1126,39 +1321,6 @@ input:checked + .slider:before {
     background: linear-gradient(135deg, #9b59b6, #8e44ad);
 }
 
-.routine-group-tag {
-    display: inline-block;
-    padding: 4px 18px;
-    border-radius: 30px;
-    font-size: 13px;
-    font-weight: 700;
-    margin: 0 6px;
-}
-
-.routine-group-tag.science {
-    background: linear-gradient(135deg, #006400, #228B22);
-    color: #fff;
-    box-shadow: 0 2px 10px rgba(0, 100, 0, 0.3);
-}
-
-.routine-group-tag.commerce {
-    background: linear-gradient(135deg, #f39c12, #e67e22);
-    color: #fff;
-    box-shadow: 0 2px 10px rgba(243, 156, 18, 0.3);
-}
-
-.routine-group-tag.arts {
-    background: linear-gradient(135deg, #9b59b6, #8e44ad);
-    color: #fff;
-    box-shadow: 0 2px 10px rgba(155, 89, 182, 0.3);
-}
-
-.routine-group-tag.ssc-special {
-    background: linear-gradient(135deg, #006400, #228B22, #ffd700);
-    color: #fff;
-    animation: sscPulse 2s ease-in-out infinite;
-}
-
 .ssc-special-badge {
     background: linear-gradient(135deg, #006400, #228B22, #FFD700);
     color: white;
@@ -1299,6 +1461,7 @@ input:checked + .slider:before {
     height: 100%;
     background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     z-index: 2000;
     justify-content: center;
     align-items: center;
@@ -1315,6 +1478,7 @@ input:checked + .slider:before {
 .routine-card {
     background: rgba(0, 100, 0, 0.1);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     padding: 35px 30px;
     border-radius: 30px;
     max-width: 500px;
@@ -1327,10 +1491,18 @@ input:checked + .slider:before {
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
 }
 
+.results-card {
+    position: relative;
+}
+
 .results-card h2,
 .about-card h2,
 .routine-card h2 {
     color: white !important;
+}
+
+.about-card {
+    position: relative;
 }
 
 .routine-table {
@@ -1391,11 +1563,11 @@ input:checked + .slider:before {
         padding: 14px 20px;
     }
     
-    .logo-area h1 {
+    .brand-text h1 {
         font-size: 26px;
     }
     
-    .logo-area .edu-text {
+    .brand-text .edu-text {
         font-size: 15px;
     }
     
@@ -1470,12 +1642,11 @@ input:checked + .slider:before {
         flex-wrap: wrap;
     }
     
-    .logo-area h1 {
+    .brand-text h1 {
         font-size: 22px;
-        letter-spacing: 1px;
     }
     
-    .logo-area .edu-text {
+    .brand-text .edu-text {
         font-size: 13px;
     }
     
@@ -1491,7 +1662,7 @@ input:checked + .slider:before {
         font-size: 13px;
     }
     
-    .user-area #userNameDisplay {
+    .user-area .user-name {
         font-size: 14px;
     }
     
@@ -1622,6 +1793,31 @@ input:checked + .slider:before {
         font-size: 14px;
     }
     
+    .routine-full-container {
+        padding: 16px 10px;
+        max-height: 450px;
+    }
+    
+    .routine-full-container .routine-table {
+        font-size: 12px;
+        min-width: 450px;
+    }
+    
+    .routine-full-container .routine-table thead th {
+        padding: 10px 8px;
+        font-size: 12px;
+    }
+    
+    .routine-full-container .routine-table tbody td {
+        padding: 10px 8px;
+        font-size: 12px;
+    }
+    
+    .routine-full-container .routine-group-tag {
+        font-size: 10px;
+        padding: 2px 10px;
+    }
+    
     .content {
         margin-top: 110px;
     }
@@ -1633,11 +1829,11 @@ input:checked + .slider:before {
         gap: 8px;
     }
     
-    .logo-area h1 {
+    .brand-text h1 {
         font-size: 18px;
     }
     
-    .logo-area .edu-text {
+    .brand-text .edu-text {
         font-size: 11px;
     }
     
@@ -1652,11 +1848,11 @@ input:checked + .slider:before {
         gap: 6px;
     }
     
-    .user-area #userNameDisplay {
+    .user-area .user-name {
         font-size: 12px;
     }
     
-    .user-area #roleDisplay {
+    .user-area .user-role {
         font-size: 10px;
         padding: 2px 10px;
     }
@@ -1720,6 +1916,32 @@ input:checked + .slider:before {
     .routine-group-tag {
         font-size: 11px;
         padding: 2px 12px;
+    }
+    
+    .routine-full-container {
+        padding: 12px 6px;
+        max-height: 350px;
+        border-radius: 20px;
+    }
+    
+    .routine-full-container .routine-table {
+        font-size: 11px;
+        min-width: 350px;
+    }
+    
+    .routine-full-container .routine-table thead th {
+        padding: 8px 6px;
+        font-size: 11px;
+    }
+    
+    .routine-full-container .routine-table tbody td {
+        padding: 8px 6px;
+        font-size: 11px;
+    }
+    
+    .routine-full-container .routine-group-tag {
+        font-size: 9px;
+        padding: 2px 8px;
     }
     
     .content {
