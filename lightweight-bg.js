@@ -13,8 +13,10 @@
             return;
         }
 
+        // Clear any existing content
         container.innerHTML = '';
 
+        // ==================== STYLE THE CONTAINER ====================
         container.style.cssText = `
             position: fixed;
             top: 0;
@@ -34,7 +36,7 @@
             );
         `;
 
-        // ==================== STARS ====================
+        // ==================== CREATE STARS ====================
         const starsContainer = document.createElement('div');
         starsContainer.style.cssText = `
             position: absolute;
@@ -70,7 +72,7 @@
         }
         container.appendChild(starsContainer);
 
-        // ==================== GOLDEN WAVES ====================
+        // ==================== CREATE GOLDEN WAVES ====================
         const wavesContainer = document.createElement('div');
         wavesContainer.style.cssText = `
             position: absolute;
@@ -82,6 +84,7 @@
             overflow: hidden;
         `;
 
+        // Wave 1 - Bottom wave (largest)
         const wave1 = document.createElement('div');
         wave1.style.cssText = `
             position: absolute;
@@ -100,6 +103,7 @@
         `;
         wavesContainer.appendChild(wave1);
 
+        // Wave 2 - Middle wave
         const wave2 = document.createElement('div');
         wave2.style.cssText = `
             position: absolute;
@@ -118,6 +122,7 @@
         `;
         wavesContainer.appendChild(wave2);
 
+        // Wave 3 - Top wave (smallest)
         const wave3 = document.createElement('div');
         wave3.style.cssText = `
             position: absolute;
@@ -138,7 +143,7 @@
 
         container.appendChild(wavesContainer);
 
-        // ==================== GOLDEN PARTICLES ====================
+        // ==================== CREATE GOLDEN PARTICLES ====================
         const particlesContainer = document.createElement('div');
         particlesContainer.style.cssText = `
             position: absolute;
@@ -176,7 +181,7 @@
         }
         container.appendChild(particlesContainer);
 
-        // ==================== GLOWING SUN ====================
+        // ==================== CREATE GLOWING SUN ====================
         const sun = document.createElement('div');
         sun.style.cssText = `
             position: absolute;
@@ -215,7 +220,7 @@
         sun.appendChild(sunCore);
         container.appendChild(sun);
 
-        // ==================== CSS ANIMATIONS ====================
+        // ==================== ADD CSS ANIMATIONS ====================
         const style = document.createElement('style');
         style.id = 'bg-animations';
         style.textContent = `
@@ -257,12 +262,24 @@
                 0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
                 100% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
             }
+
+            /* Reduce animations on low-end devices */
+            @media (prefers-reduced-motion: reduce) {
+                #canvas-container * {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
         `;
         document.head.appendChild(style);
 
         console.log('✨ Lightweight background loaded successfully!');
     }
 
+    // ============================================================
+    // INITIALIZE ON DOM READY
+    // ============================================================
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', createLightweightBackground);
     } else {
