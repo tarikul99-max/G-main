@@ -140,28 +140,17 @@ window.toggleGroupField = toggleGroupField;
 function animateGloriousText() {
     const h1 = document.querySelector('.brand-text h1');
     if (!h1) return;
-    
-    // Check if already processed
     if (h1.querySelector('.letter')) return;
     
     const text = h1.textContent;
     if (text !== 'GLORIOUS') return;
     
-    // Clear the original text
     h1.textContent = '';
-    
-    // 8 Fixed Colors for GLORIOUS
     const colors = ['#FF6B6B', '#FF9F43', '#FECA57', '#48DBFB', '#0ABDE3', '#10AC84', '#EE5A24', '#FF6B6B'];
-    
-    // Rotation values as specified
     const rotations = [20, -14, 8, -12, 14, -15, 16, -20];
-    
-    // Y-axis translation (position offset)
     const translations = [-3, 2, -4, 1, -2, 3, -1, 2];
     
-    // Wrap each letter in a span
-    const letters = text.split('');
-    letters.forEach((letter, index) => {
+    text.split('').forEach((letter, index) => {
         const span = document.createElement('span');
         span.className = 'letter';
         span.textContent = letter;
@@ -178,54 +167,35 @@ function animateGloriousText() {
 // ============================================================
 function animateLoginGloriousText() {
     const h3 = document.getElementById('loginBrandText');
-    if (!h3) return;
-    
-    // Check if already processed
-    if (h3.dataset.initialized === 'true') return;
+    if (!h3 || h3.dataset.initialized === 'true') return;
     h3.dataset.initialized = 'true';
     
     const letters = h3.querySelectorAll('.letter');
-    
-    // Define colors for each letter
     const colors = [
-        '#FF6B6B', '#FF9F43', '#FECA57', '#48DBFB', '#0ABDE3', '#10AC84', '#EE5A24', '#FF6B6B', // GLORIOUS
-        '#FF6B6B', '#FF9F43', '#FECA57', '#48DBFB', '#0ABDE3', '#10AC84', '#EE5A24', '#FF6B6B', // EDUCATION (starts at index 10)
-        '#FF6B6B', '#FF9F43', '#FECA57', '#48DBFB' // CARE (starts at index 19)
+        '#FF6B6B', '#FF9F43', '#FECA57', '#48DBFB', '#0ABDE3', '#10AC84', '#EE5A24', '#FF6B6B',
+        '#FF6B6B', '#FF9F43', '#FECA57', '#48DBFB', '#0ABDE3', '#10AC84', '#EE5A24', '#FF6B6B',
+        '#FF6B6B', '#FF9F43', '#FECA57', '#48DBFB'
     ];
-    
-    // Define rotations for each letter
     const rotations = [
-        20, -14, 8, -12, 14, -15, 16, -20, // GLORIOUS
-        0, // space
-        12, -8, 5, -7, 8, -9, 9, -11, // EDUCATION
-        0, // space
-        15, -10, 18, -13 // CARE
+        20, -14, 8, -12, 14, -15, 16, -20,
+        0, 12, -8, 5, -7, 8, -9, 9, -11,
+        0, 15, -10, 18, -13
     ];
-    
-    // Define Y-axis translations
     const translations = [
-        -3, 2, -4, 1, -2, 3, -1, 2, // GLORIOUS
-        0, // space
-        -2, 1, -2, 1, -1, 2, -1, 1, // EDUCATION
-        0, // space
-        -2, 1, -3, 2 // CARE
+        -3, 2, -4, 1, -2, 3, -1, 2,
+        0, -2, 1, -2, 1, -1, 2, -1, 1,
+        0, -2, 1, -3, 2
     ];
     
     letters.forEach((letter, index) => {
         if (letter.classList.contains('space')) return;
-        
-        const colorIndex = index < 8 ? index : 
-                          (index >= 10 && index < 18) ? index - 2 : 
-                          (index >= 19) ? index - 5 : 0;
-        
+        const colorIndex = index < 8 ? index : (index >= 10 && index < 18) ? index - 2 : (index >= 19) ? index - 5 : 0;
         if (colorIndex < colors.length) {
             letter.style.color = colors[colorIndex];
         }
-        
         if (index < rotations.length && !letter.classList.contains('space')) {
             letter.style.transform = `rotate(${rotations[index]}deg) translateY(${translations[index]}px)`;
             letter.style.transformOrigin = (index % 2 === 0) ? 'center bottom' : 'center top';
-            
             if (colors[colorIndex]) {
                 letter.style.textShadow = `0 0 20px ${colors[colorIndex]}66`;
             }
@@ -361,8 +331,6 @@ function showApp() {
     roleDisplay.textContent = currentRole === 'admin' ? 'পরিচালক' : 
                              currentRole === 'teacher' ? 'শিক্ষক' : 'ছাত্র';
     loadAllData();
-    
-    // Re-apply text after login
     setTimeout(animateGloriousText, 200);
 }
 
@@ -372,13 +340,25 @@ function showApp() {
 window.addEventListener('scroll', function() {
     const navbar = document.querySelector('.navbar');
     if (navbar) {
-        if (window.scrollY > 50) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
-        }
+        navbar.classList.toggle('scrolled', window.scrollY > 30);
     }
 });
+
+// ============================================================
+// BISMILLAH ANIMATION
+// ============================================================
+function animateBismillah() {
+    const bismillah = document.querySelector('.bismillah');
+    if (bismillah) {
+        setInterval(() => {
+            bismillah.style.transition = 'opacity 0.8s ease';
+            bismillah.style.opacity = '0.3';
+            setTimeout(() => {
+                bismillah.style.opacity = '0.8';
+            }, 400);
+        }, 4000);
+    }
+}
 
 // ============================================================
 // LOAD ALL DATA
@@ -521,7 +501,7 @@ function renderFullRoutine() {
 
     if (!hasRoutine) {
         html = `<div class="empty-routine">
-            <i class="fas fa-calendar-times" style="font-size:40px; display:block; margin-bottom:12px; opacity:0.3;"></i>
+            <i class="fas fa-calendar-times"></i>
             <p>কোনো রুটিন যোগ করা হয়নি।</p>
             <p style="font-size:14px; opacity:0.6;">অ্যাডমিন রুটিন যোগ করুন।</p>
         </div>`;
@@ -550,8 +530,8 @@ function renderTeachers() {
         ` : '';
         
         const classDisplay = isCoordinator ? 
-            '<p style="font-size:12px; color:rgba(255,255,255,0.4); font-style:italic;">কোন ক্লাস নেই (Coordinator)</p>' : 
-            `<div class="teacher-class-tags" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px;">
+            '<p style="font-size:12px; color:rgba(255,255,255,0.4); font-style:italic;">কোন ক্লাস নেই</p>' : 
+            `<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px;">
                 ${teacher.classes ? teacher.classes.map(c => `<span style="background:rgba(255,215,0,0.15);padding:4px 14px;border-radius:30px;font-size:12px;color:#ffd700;font-weight:600;">${c === 'SSC Special' ? '🎯 ' + c : c}</span>`).join('') : ''}
             </div>`;
         
@@ -694,7 +674,7 @@ function renderTeacherProfile(teacherData) {
         '<span style="background:linear-gradient(135deg,#ffd700,#f5a623); color:#191970; padding:4px 18px; border-radius:30px; font-size:13px; font-weight:700; display:inline-block; margin-top:6px;"><i class="fas fa-user-tie"></i> Office Coordinator</span>' : '';
     
     const classDisplay = isCoordinator ? 
-        '<p style="color:rgba(255,255,255,0.5); font-style:italic;">কোন ক্লাস নেই (Coordinator)</p>' : 
+        '<p style="color:rgba(255,255,255,0.5); font-style:italic;">কোন ক্লাস নেই</p>' : 
         `<p style="color:rgba(255,255,255,0.8);"><strong>ক্লাস:</strong> ${teacherData.classes ? teacherData.classes.map(c => c === 'SSC Special' ? '🎯 SSC Special' : c).join(', ') : ''}</p>`;
     
     container.innerHTML = `
@@ -860,7 +840,7 @@ function renderTodayTomorrowRoutine() {
     let html = '<div class="routine-side-by-side">';
     
     html += `<div class="today-routine-card">
-        <h3><span class="icon">📅</span> আজকের রুটিন <span class="today-date">(${todayBangla})</span></h3>`;
+        <h3>📅 আজকের রুটিন (${todayBangla})</h3>`;
     let hasToday = false;
     if (allRoutines[todayName]) {
         const sortedKeys = Object.keys(allRoutines[todayName]).sort();
@@ -894,7 +874,7 @@ function renderTodayTomorrowRoutine() {
     html += '</div>';
     
     html += `<div class="tomorrow-routine-card">
-        <h3><span class="icon">🌅</span> আগামীকালের রুটিন <span class="tomorrow-date">(${tomorrowBangla})</span></h3>`;
+        <h3>🌅 আগামীকালের রুটিন (${tomorrowBangla})</h3>`;
     let hasTomorrow = false;
     if (allRoutines[tomorrowName]) {
         const sortedKeys = Object.keys(allRoutines[tomorrowName]).sort();
@@ -1209,13 +1189,13 @@ function renderStudentOwnRoutine() {
     
     if (!hasRoutine) {
         html = `<div class="empty-routine">
-            <i class="fas fa-calendar-times" style="font-size:40px; display:block; margin-bottom:12px; opacity:0.3;"></i>
+            <i class="fas fa-calendar-times"></i>
             <p>আপনার জন্য এখনো কোনো রুটিন যোগ করা হয়নি।</p>
             <p style="font-size:14px; opacity:0.6;">অফিসে যোগাযোগ করুন রুটিন পেতে।</p>
         </div>`;
     } else if (todaySubject && todaySubject !== '-') {
         html += `<div class="today-subject-alert">
-            <i class="fas fa-bell" style="margin-right:10px;"></i> 
+            <i class="fas fa-bell"></i> 
             <strong>আজকের বিষয়:</strong> ${todaySubject}
         </div>`;
     }
@@ -2068,7 +2048,7 @@ window.deletePost = function(postKey) {
 };
 
 // ============================================================
-// VIEW BUTTONS - NEW PAGE যাবে না
+// VIEW BUTTONS
 // ============================================================
 document.getElementById('viewRoutineBtn')?.addEventListener('click', function(e) {
     e.preventDefault();
@@ -2084,18 +2064,12 @@ document.getElementById('viewRoutineBtn')?.addEventListener('click', function(e)
     renderFullRoutine();
 });
 
-// ============================================================
-// VIEW RESULT BUTTON - একই পেজে Modal খুলবে (New Page যাবে না)
-// ============================================================
 document.getElementById('viewResultBtn')?.addEventListener('click', function(e) {
     e.preventDefault();
     e.stopPropagation();
     document.getElementById('resultModal').style.display = 'flex';
 });
 
-// ============================================================
-// ABOUT BUTTON - একই পেজে Modal খুলবে
-// ============================================================
 document.getElementById('aboutUsBtn')?.addEventListener('click', function(e) {
     e.preventDefault();
     document.getElementById('aboutModal').style.display = 'flex';
@@ -2105,17 +2079,18 @@ document.getElementById('saveClassBtn')?.addEventListener('click', () => {
     alert('✅ সব তথ্য ইতিমধ্যে Firebase এ অটো-সেভ আছে।');
 });
 
+document.getElementById('saveAllRoutinesBtn')?.addEventListener('click', () => {
+    alert('✅ সব রুটিন ইতিমধ্যে অটো-সেভ হয়েছে।');
+});
+
 // ============================================================
 // INITIALIZE ON DOM READY
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
-    // Animate GLORIOUS text in navbar
     setTimeout(animateGloriousText, 100);
-    
-    // Animate login brand text
     setTimeout(animateLoginGloriousText, 50);
+    setTimeout(animateBismillah, 200);
     
-    // Check session
     const hasSession = checkSession();
     if (!hasSession) {
         loginScreen.style.display = 'flex';
@@ -2128,4 +2103,4 @@ console.log('✅ অটো-সেভ সক্রিয় আছে');
 console.log('✅ Office Coordinator ফিচার যোগ করা হয়েছে');
 console.log('✅ GLORIOUS টেক্সট 8টি রঙে ও Wave Rotate এ সাজানো');
 console.log('✅ LOGIN এ "GLORIOUS EDUCATION CARE" রোটেটেড টেক্সট');
-console.log('✅ "ফলাফল দেখুন" নতুন পেজে যায় না - same browser tab takbe');
+console.log('✅ NAVBAR এ BISMILLAH, ঠিকানা ও ফোন নম্বর যুক্ত করা হয়েছে');
