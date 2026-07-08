@@ -135,7 +135,7 @@ function toggleGroupField(className) {
 window.toggleGroupField = toggleGroupField;
 
 // ============================================================
-// GLORIOUS TEXT - STATIC ROTATE FROM POSITION (No Animation)
+// GLORIOUS TEXT - STATIC ROTATE FROM POSITION (Navbar)
 // ============================================================
 function animateGloriousText() {
     const h1 = document.querySelector('.brand-text h1');
@@ -170,6 +170,66 @@ function animateGloriousText() {
         span.style.transform = `rotate(${rotations[index]}deg) translateY(${translations[index]}px)`;
         span.style.transformOrigin = index % 2 === 0 ? 'center bottom' : 'center top';
         h1.appendChild(span);
+    });
+}
+
+// ============================================================
+// LOGIN BRAND TEXT - ROTATED GLORIOUS EDUCATION CARE
+// ============================================================
+function animateLoginGloriousText() {
+    const h3 = document.getElementById('loginBrandText');
+    if (!h3) return;
+    
+    // Check if already processed
+    if (h3.dataset.initialized === 'true') return;
+    h3.dataset.initialized = 'true';
+    
+    const letters = h3.querySelectorAll('.letter');
+    
+    // Define colors for each letter
+    const colors = [
+        '#FF6B6B', '#FF9F43', '#FECA57', '#48DBFB', '#0ABDE3', '#10AC84', '#EE5A24', '#FF6B6B', // GLORIOUS
+        '#FF6B6B', '#FF9F43', '#FECA57', '#48DBFB', '#0ABDE3', '#10AC84', '#EE5A24', '#FF6B6B', // EDUCATION (starts at index 10)
+        '#FF6B6B', '#FF9F43', '#FECA57', '#48DBFB' // CARE (starts at index 19)
+    ];
+    
+    // Define rotations for each letter
+    const rotations = [
+        20, -14, 8, -12, 14, -15, 16, -20, // GLORIOUS
+        0, // space
+        12, -8, 5, -7, 8, -9, 9, -11, // EDUCATION
+        0, // space
+        15, -10, 18, -13 // CARE
+    ];
+    
+    // Define Y-axis translations
+    const translations = [
+        -3, 2, -4, 1, -2, 3, -1, 2, // GLORIOUS
+        0, // space
+        -2, 1, -2, 1, -1, 2, -1, 1, // EDUCATION
+        0, // space
+        -2, 1, -3, 2 // CARE
+    ];
+    
+    letters.forEach((letter, index) => {
+        if (letter.classList.contains('space')) return;
+        
+        const colorIndex = index < 8 ? index : 
+                          (index >= 10 && index < 18) ? index - 2 : 
+                          (index >= 19) ? index - 5 : 0;
+        
+        if (colorIndex < colors.length) {
+            letter.style.color = colors[colorIndex];
+        }
+        
+        if (index < rotations.length && !letter.classList.contains('space')) {
+            letter.style.transform = `rotate(${rotations[index]}deg) translateY(${translations[index]}px)`;
+            letter.style.transformOrigin = (index % 2 === 0) ? 'center bottom' : 'center top';
+            
+            if (colors[colorIndex]) {
+                letter.style.textShadow = `0 0 20px ${colors[colorIndex]}66`;
+            }
+        }
     });
 }
 
@@ -2049,8 +2109,11 @@ document.getElementById('saveClassBtn')?.addEventListener('click', () => {
 // INITIALIZE ON DOM READY
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
-    // Animate GLORIOUS text
+    // Animate GLORIOUS text in navbar
     setTimeout(animateGloriousText, 100);
+    
+    // Animate login brand text
+    setTimeout(animateLoginGloriousText, 50);
     
     // Check session
     const hasSession = checkSession();
@@ -2064,4 +2127,5 @@ console.log('🔥 Firebase Connected');
 console.log('✅ অটো-সেভ সক্রিয় আছে');
 console.log('✅ Office Coordinator ফিচার যোগ করা হয়েছে');
 console.log('✅ GLORIOUS টেক্সট 8টি রঙে ও Wave Rotate এ সাজানো');
+console.log('✅ LOGIN এ "GLORIOUS EDUCATION CARE" রোটেটেড টেক্সট');
 console.log('✅ "ফলাফল দেখুন" নতুন পেজে যায় না - same browser tab takbe');
