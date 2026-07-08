@@ -1,7 +1,3 @@
-// ============================================================
-// LIGHTWEIGHT CSS ANIMATED BACKGROUND - MOBILE FRIENDLY
-// No Three.js, No WebGL - Pure CSS Animations
-// ============================================================
 
 (function() {
     'use strict';
