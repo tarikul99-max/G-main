@@ -24,7 +24,7 @@ window.firebase = firebase;
 let currentUserKey = null;
 let currentUserName = null;
 let currentRole = null;
-let selectedClass = null;
+let selectedClass = 'One'; // ✅ ডিফল্ট ক্লাস সেট করা হয়েছে
 let currentAttendanceDate = null;
 let attendanceData = {};
 let allStudents = {};
@@ -697,6 +697,7 @@ function renderClassButtons() {
     const container = document.getElementById('classButtons');
     if (!container) return;
     container.innerHTML = '<div class="class-buttons-container">';
+    
     allClasses.forEach(cls => {
         const btn = document.createElement('button');
         btn.className = 'class-btn' + (selectedClass === cls ? ' active' : '');
@@ -711,6 +712,14 @@ function renderClassButtons() {
         container.appendChild(btn);
     });
     container.innerHTML += '</div>';
+    
+    // ✅ ডিফল্ট ক্লাস সিলেক্টেড না থাকলে প্রথমটি সিলেক্ট করুন
+    if (!document.querySelector('.class-btn.active')) {
+        const firstBtn = container.querySelector('.class-btn');
+        if (firstBtn) {
+            firstBtn.click();
+        }
+    }
 }
 
 // ============================================================
@@ -762,7 +771,7 @@ window.deleteStudent = function(key) {
 };
 
 // ============================================================
-// ADD STUDENT
+// ADD STUDENT - FIXED
 // ============================================================
 document.getElementById('addCousinBtn').addEventListener('click', () => {
     const name = document.getElementById('cousinName').value.trim();
@@ -775,11 +784,28 @@ document.getElementById('addCousinBtn').addEventListener('click', () => {
         alert('নাম, আইডি এবং পাসওয়ার্ড দিন');
         return;
     }
+    
+    // ✅ ক্লাস নির্বাচন চেক - ফিক্স করা হয়েছে
     if (!selectedClass) {
-        alert('ক্লাস নির্বাচন করুন');
+        alert('দয়া করে একটি ক্লাস নির্বাচন করুন!');
+        // অটো-সিলেক্ট করার চেষ্টা
+        const firstClassBtn = document.querySelector('.class-btn');
+        if (firstClassBtn) {
+            firstClassBtn.click();
+            setTimeout(() => {
+                // আবার চেষ্টা
+                if (selectedClass) {
+                    addStudentToDatabase(name, id, password, group, guardianPhone);
+                }
+            }, 100);
+        }
         return;
     }
     
+    addStudentToDatabase(name, id, password, group, guardianPhone);
+});
+
+function addStudentToDatabase(name, id, password, group, guardianPhone) {
     if (isGroupRequired(selectedClass)) {
         if (!group) {
             alert(`⚠️ ${selectedClass === 'SSC Special' ? '🎯 SSC Special' : selectedClass} শ্রেণির জন্য গ্রুপ নির্বাচন আবশ্যক!`);
@@ -809,7 +835,7 @@ document.getElementById('addCousinBtn').addEventListener('click', () => {
     }).catch((error) => {
         alert('❌ যোগ করতে সমস্যা হয়েছে: ' + error.message);
     });
-});
+}
 
 document.getElementById('studentImageInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
@@ -1274,7 +1300,7 @@ function setupAdminUI() {
     populateAttendanceClassSelect();
     populateRoutineClassSelect();
     setupAttendance();
-    toggleGroupField(null);
+    toggleGroupField(selectedClass);
 }
 
 function setupTeacherUI(teacherData) {
