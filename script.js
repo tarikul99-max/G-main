@@ -24,7 +24,7 @@ window.firebase = firebase;
 let currentUserKey = null;
 let currentUserName = null;
 let currentRole = null;
-let selectedClass = 'One'; // ✅ ডিফল্ট ক্লাস সেট করা হয়েছে
+let selectedClass = null; // ✅ খালি রাখা হয়েছে
 let currentAttendanceDate = null;
 let attendanceData = {};
 let allStudents = {};
@@ -691,7 +691,7 @@ function renderTeacherProfile(teacherData) {
 }
 
 // ============================================================
-// CLASS BUTTONS
+// CLASS BUTTONS - FIXED
 // ============================================================
 function renderClassButtons() {
     const container = document.getElementById('classButtons');
@@ -702,19 +702,25 @@ function renderClassButtons() {
         const btn = document.createElement('button');
         btn.className = 'class-btn' + (selectedClass === cls ? ' active' : '');
         btn.textContent = cls === 'SSC Special' ? '🎯 ' + cls : cls;
-        btn.onclick = () => {
+        btn.onclick = function() {
             selectedClass = cls;
-            renderClassButtons();
+            // সব বাটন থেকে active ক্লাস রিমুভ করুন
+            document.querySelectorAll('.class-btn').forEach(b => b.classList.remove('active'));
+            // এই বাটনে active যোগ করুন
+            this.classList.add('active');
+            // স্টুডেন্ট লিস্ট আপডেট করুন
             renderClassStudents(cls);
+            // সিলেক্টেড ক্লাসের নাম আপডেট করুন
             document.getElementById('selectedClassName').textContent = cls === 'SSC Special' ? '🎯 ' + cls : cls;
+            // গ্রুপ ফিল্ড টগল করুন
             toggleGroupField(cls);
         };
         container.appendChild(btn);
     });
     container.innerHTML += '</div>';
     
-    // ✅ ডিফল্ট ক্লাস সিলেক্টেড না থাকলে প্রথমটি সিলেক্ট করুন
-    if (!document.querySelector('.class-btn.active')) {
+    // ✅ যদি কোন ক্লাস সিলেক্ট না থাকে, প্রথমটি সিলেক্ট করুন
+    if (!selectedClass) {
         const firstBtn = container.querySelector('.class-btn');
         if (firstBtn) {
             firstBtn.click();
@@ -771,41 +777,40 @@ window.deleteStudent = function(key) {
 };
 
 // ============================================================
-// ADD STUDENT - FIXED
+// ADD STUDENT - COMPLETELY FIXED
 // ============================================================
-document.getElementById('addCousinBtn').addEventListener('click', () => {
+document.getElementById('addCousinBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    
     const name = document.getElementById('cousinName').value.trim();
     const id = document.getElementById('cousinId').value.trim();
     const password = document.getElementById('cousinPass').value.trim();
     const group = document.getElementById('cousinGroup').value;
     const guardianPhone = document.getElementById('cousinGuardianPhone').value.trim();
     
+    // ✅ নাম, আইডি, পাসওয়ার্ড চেক
     if (!name || !id || !password) {
         alert('নাম, আইডি এবং পাসওয়ার্ড দিন');
         return;
     }
     
-    // ✅ ক্লাস নির্বাচন চেক - ফিক্স করা হয়েছে
+    // ✅ ক্লাস সিলেক্ট করা আছে কিনা চেক
     if (!selectedClass) {
-        alert('দয়া করে একটি ক্লাস নির্বাচন করুন!');
-        // অটো-সিলেক্ট করার চেষ্টা
+        alert('⚠️ দয়া করে প্রথমে একটি ক্লাস নির্বাচন করুন!');
+        // ক্লাস বাটনে ফোকাস করুন
         const firstClassBtn = document.querySelector('.class-btn');
         if (firstClassBtn) {
-            firstClassBtn.click();
+            firstClassBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            firstClassBtn.style.transition = 'all 0.3s ease';
+            firstClassBtn.style.boxShadow = '0 0 30px rgba(255,215,0,0.5)';
             setTimeout(() => {
-                // আবার চেষ্টা
-                if (selectedClass) {
-                    addStudentToDatabase(name, id, password, group, guardianPhone);
-                }
-            }, 100);
+                firstClassBtn.style.boxShadow = 'none';
+            }, 2000);
         }
         return;
     }
     
-    addStudentToDatabase(name, id, password, group, guardianPhone);
-});
-
-function addStudentToDatabase(name, id, password, group, guardianPhone) {
+    // ✅ গ্রুপ চেক (যদি প্রয়োজন হয়)
     if (isGroupRequired(selectedClass)) {
         if (!group) {
             alert(`⚠️ ${selectedClass === 'SSC Special' ? '🎯 SSC Special' : selectedClass} শ্রেণির জন্য গ্রুপ নির্বাচন আবশ্যক!`);
@@ -814,6 +819,7 @@ function addStudentToDatabase(name, id, password, group, guardianPhone) {
         }
     }
     
+    // ✅ সব ঠিক থাকলে ডাটাবেজে সেভ করুন
     const newStudent = {
         name: name,
         id: id,
@@ -821,22 +827,26 @@ function addStudentToDatabase(name, id, password, group, guardianPhone) {
         class: selectedClass,
         group: group || '',
         guardianPhone: guardianPhone || '',
-        image: document.getElementById('studentImagePreview').src
+        image: document.getElementById('studentImagePreview').src || 'https://ui-avatars.com/api/?background=0a3b2e&color=fff&name=' + encodeURIComponent(name)
     };
     
     const newRef = db.ref('students').push();
-    newRef.set(newStudent).then(() => {
-        document.getElementById('cousinName').value = '';
-        document.getElementById('cousinId').value = '';
-        document.getElementById('cousinPass').value = '';
-        document.getElementById('cousinGroup').value = '';
-        document.getElementById('cousinGuardianPhone').value = '';
-        alert('✅ ছাত্র/ছাত্রী যোগ করা হয়েছে');
-    }).catch((error) => {
-        alert('❌ যোগ করতে সমস্যা হয়েছে: ' + error.message);
-    });
-}
+    newRef.set(newStudent)
+        .then(() => {
+            // ফর্ম ক্লিয়ার করুন
+            document.getElementById('cousinName').value = '';
+            document.getElementById('cousinId').value = '';
+            document.getElementById('cousinPass').value = '';
+            document.getElementById('cousinGroup').value = '';
+            document.getElementById('cousinGuardianPhone').value = '';
+            alert('✅ ছাত্র/ছাত্রী যোগ করা হয়েছে');
+        })
+        .catch((error) => {
+            alert('❌ যোগ করতে সমস্যা হয়েছে: ' + error.message);
+        });
+});
 
+// Student Image Upload
 document.getElementById('studentImageInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
@@ -2127,6 +2137,3 @@ console.log('📚 GLORIOUS Education Care সিস্টেম লোড হয
 console.log('🔥 Firebase Connected');
 console.log('✅ অটো-সেভ সক্রিয় আছে');
 console.log('✅ Office Coordinator ফিচার যোগ করা হয়েছে');
-console.log('✅ GLORIOUS টেক্সট 8টি রঙে ও Wave Rotate এ সাজানো');
-console.log('✅ LOGIN এ "GLORIOUS EDUCATION CARE" রোটেটেড টেক্সট');
-console.log('✅ NAVBAR এ BISMILLAH, ঠিকানা ও ফোন নম্বর যুক্ত করা হয়েছে');
