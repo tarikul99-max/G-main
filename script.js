@@ -695,26 +695,51 @@ function renderTeacherProfile(teacherData) {
 // ============================================================
 function renderClassButtons() {
     const container = document.getElementById('classButtons');
-    if (!container) return;
+    if (!container) {
+        console.error('classButtons element not found!');
+        return;
+    }
+    
     container.innerHTML = '<div class="class-buttons-container">';
     
     allClasses.forEach(cls => {
         const btn = document.createElement('button');
         btn.className = 'class-btn' + (selectedClass === cls ? ' active' : '');
         btn.textContent = cls === 'SSC Special' ? '🎯 ' + cls : cls;
-        btn.onclick = function() {
+        btn.setAttribute('data-class', cls);
+        
+        btn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('✅ ক্লাস সিলেক্ট করা হয়েছে:', cls);
+            
+            // সিলেক্টেড ক্লাস আপডেট করুন
             selectedClass = cls;
+            
             // সব বাটন থেকে active ক্লাস রিমুভ করুন
-            document.querySelectorAll('.class-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.class-btn').forEach(b => {
+                b.classList.remove('active');
+            });
+            
             // এই বাটনে active যোগ করুন
             this.classList.add('active');
+            
+            // সিলেক্টেড ক্লাসের নাম আপডেট করুন
+            const selectedNameSpan = document.getElementById('selectedClassName');
+            if (selectedNameSpan) {
+                selectedNameSpan.textContent = cls === 'SSC Special' ? '🎯 ' + cls : cls;
+            }
+            
             // স্টুডেন্ট লিস্ট আপডেট করুন
             renderClassStudents(cls);
-            // সিলেক্টেড ক্লাসের নাম আপডেট করুন
-            document.getElementById('selectedClassName').textContent = cls === 'SSC Special' ? '🎯 ' + cls : cls;
+            
             // গ্রুপ ফিল্ড টগল করুন
             toggleGroupField(cls);
+            
+            console.log('✅ বর্তমান selectedClass:', selectedClass);
         };
+        
         container.appendChild(btn);
     });
     container.innerHTML += '</div>';
@@ -723,8 +748,16 @@ function renderClassButtons() {
     if (!selectedClass) {
         const firstBtn = container.querySelector('.class-btn');
         if (firstBtn) {
+            console.log('✅ প্রথম ক্লাস অটো-সিলেক্ট করা হচ্ছে:', firstBtn.getAttribute('data-class'));
             firstBtn.click();
         }
+    } else {
+        // সিলেক্টেড ক্লাস হাইলাইট করুন
+        document.querySelectorAll('.class-btn').forEach(b => {
+            if (b.getAttribute('data-class') === selectedClass) {
+                b.classList.add('active');
+            }
+        });
     }
 }
 
@@ -733,17 +766,28 @@ function renderClassButtons() {
 // ============================================================
 function renderClassStudents(className) {
     const container = document.getElementById('classStudentsTable');
-    if (!container) return;
+    if (!container) {
+        console.error('classStudentsTable element not found!');
+        return;
+    }
+    
+    if (!className) {
+        container.innerHTML = '<p class="empty-state">ক্লাস নির্বাচন করুন</p>';
+        return;
+    }
+    
     const students = {};
     for (let key in allStudents) {
         if (allStudents[key].class === className) {
             students[key] = allStudents[key];
         }
     }
+    
     if (Object.keys(students).length === 0) {
         container.innerHTML = '<p class="empty-state">এই ক্লাসে কোনো ছাত্র/ছাত্রী নেই</p>';
         return;
     }
+    
     let html = `<div class="table-responsive"><table><thead><tr><th>ছবি</th><th>নাম</th><th>আইডি</th><th>ক্লাস</th><th>গ্রুপ</th><th>অভিভাবকের মোবাইল</th><th>অ্যাকশন</th></tr></thead><tbody>`;
     for (let key in students) {
         const s = students[key];
@@ -795,8 +839,11 @@ document.getElementById('addCousinBtn').addEventListener('click', function(e) {
     }
     
     // ✅ ক্লাস সিলেক্ট করা আছে কিনা চেক
+    console.log('🔍 বর্তমান selectedClass:', selectedClass);
+    
     if (!selectedClass) {
         alert('⚠️ দয়া করে প্রথমে একটি ক্লাস নির্বাচন করুন!');
+        
         // ক্লাস বাটনে ফোকাস করুন
         const firstClassBtn = document.querySelector('.class-btn');
         if (firstClassBtn) {
@@ -840,6 +887,9 @@ document.getElementById('addCousinBtn').addEventListener('click', function(e) {
             document.getElementById('cousinGroup').value = '';
             document.getElementById('cousinGuardianPhone').value = '';
             alert('✅ ছাত্র/ছাত্রী যোগ করা হয়েছে');
+            
+            // তালিকা রিফ্রেশ করুন
+            renderClassStudents(selectedClass);
         })
         .catch((error) => {
             alert('❌ যোগ করতে সমস্যা হয়েছে: ' + error.message);
