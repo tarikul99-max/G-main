@@ -24,7 +24,7 @@ window.firebase = firebase;
 let currentUserKey = null;
 let currentUserName = null;
 let currentRole = null;
-let selectedClass = null; // ✅ খালি রাখা হয়েছে
+let selectedClass = null;
 let currentAttendanceDate = null;
 let attendanceData = {};
 let allStudents = {};
@@ -127,7 +127,7 @@ function toggleGroupField(className) {
         groupSelect.required = false;
         groupSelect.value = '';
         if (requiredMsg) {
-            requiredMsg.textContent = 'গ্রুপ নির্বাচন ঐচ্ছিক (শুধু SSC ও SSC Special এর জন্য আবশ্যক)';
+            requiredMsg.textContent = 'গ্রুপ নির্বাচন ঐচ্ছিক (শুধু Nine, Ten, SSC Special এর জন্য আবশ্যক)';
             requiredMsg.style.color = 'rgba(255,255,255,0.4)';
         }
     }
@@ -135,7 +135,7 @@ function toggleGroupField(className) {
 window.toggleGroupField = toggleGroupField;
 
 // ============================================================
-// GLORIOUS TEXT - STATIC ROTATE FROM POSITION (Navbar)
+// GLORIOUS TEXT ANIMATION - NAVBAR
 // ============================================================
 function animateGloriousText() {
     const h1 = document.querySelector('.brand-text h1');
@@ -158,49 +158,71 @@ function animateGloriousText() {
         span.style.color = colors[index % colors.length];
         span.style.transform = `rotate(${rotations[index]}deg) translateY(${translations[index]}px)`;
         span.style.transformOrigin = index % 2 === 0 ? 'center bottom' : 'center top';
+        span.style.textShadow = `0 0 20px ${colors[index % colors.length]}66`;
+        span.style.transition = 'all 0.3s ease';
         h1.appendChild(span);
     });
 }
 
 // ============================================================
-// LOGIN BRAND TEXT - ROTATED GLORIOUS EDUCATION CARE
+// LOGIN BRAND TEXT ANIMATION
 // ============================================================
 function animateLoginGloriousText() {
     const h3 = document.getElementById('loginBrandText');
-    if (!h3 || h3.dataset.initialized === 'true') return;
-    h3.dataset.initialized = 'true';
+    if (!h3 || h3.dataset.animated === 'true') return;
+    h3.dataset.animated = 'true';
     
     const letters = h3.querySelectorAll('.letter');
     const colors = [
-        '#FF6B6B', '#FF9F43', '#FECA57', '#48DBFB', '#0ABDE3', '#10AC84', '#EE5A24', '#FF6B6B',
-        '#FF6B6B', '#FF9F43', '#FECA57', '#48DBFB', '#0ABDE3', '#10AC84', '#EE5A24', '#FF6B6B',
-        '#FF6B6B', '#FF9F43', '#FECA57', '#48DBFB'
+        '#FF6B6B', '#FF9F43', '#FECA57', '#48DBFB', '#0ABDE3', 
+        '#10AC84', '#EE5A24', '#FF6B6B', '#FF9F43', '#FECA57',
+        '#48DBFB', '#0ABDE3', '#10AC84', '#EE5A24', '#FF6B6B',
+        '#FF9F43', '#FECA57', '#48DBFB', '#0ABDE3', '#10AC84'
     ];
     const rotations = [
-        20, -14, 8, -12, 14, -15, 16, -20,
-        0, 12, -8, 5, -7, 8, -9, 9, -11,
-        0, 15, -10, 18, -13
+        20, -14, 8, -12, 14, -15, 16, -20, 12, -8,
+        5, -7, 8, -9, 9, -11, 15, -10, 18, -13
     ];
     const translations = [
-        -3, 2, -4, 1, -2, 3, -1, 2,
-        0, -2, 1, -2, 1, -1, 2, -1, 1,
-        0, -2, 1, -3, 2
+        -3, 2, -4, 1, -2, 3, -1, 2, -2, 1,
+        -2, 1, -1, 2, -1, 1, -2, 1, -3, 2
     ];
     
-    letters.forEach((letter, index) => {
-        if (letter.classList.contains('space')) return;
-        const colorIndex = index < 8 ? index : (index >= 10 && index < 18) ? index - 2 : (index >= 19) ? index - 5 : 0;
+    let colorIndex = 0;
+    let rotIndex = 0;
+    
+    letters.forEach((letter) => {
+        if (letter.classList.contains('space')) {
+            return;
+        }
         if (colorIndex < colors.length) {
             letter.style.color = colors[colorIndex];
+            letter.style.textShadow = `0 0 20px ${colors[colorIndex]}66`;
         }
-        if (index < rotations.length && !letter.classList.contains('space')) {
-            letter.style.transform = `rotate(${rotations[index]}deg) translateY(${translations[index]}px)`;
-            letter.style.transformOrigin = (index % 2 === 0) ? 'center bottom' : 'center top';
-            if (colors[colorIndex]) {
-                letter.style.textShadow = `0 0 20px ${colors[colorIndex]}66`;
-            }
+        if (rotIndex < rotations.length) {
+            letter.style.transform = `rotate(${rotations[rotIndex]}deg) translateY(${translations[rotIndex]}px)`;
+            letter.style.transformOrigin = rotIndex % 2 === 0 ? 'center bottom' : 'center top';
         }
+        letter.style.transition = 'all 0.3s ease';
+        colorIndex++;
+        rotIndex++;
     });
+}
+
+// ============================================================
+// BISMILLAH ANIMATION
+// ============================================================
+function animateBismillah() {
+    const bismillah = document.querySelector('.bismillah');
+    if (bismillah) {
+        setInterval(() => {
+            bismillah.style.transition = 'opacity 0.8s ease';
+            bismillah.style.opacity = '0.3';
+            setTimeout(() => {
+                bismillah.style.opacity = '0.8';
+            }, 400);
+        }, 4000);
+    }
 }
 
 // ============================================================
@@ -331,33 +353,7 @@ function showApp() {
     roleDisplay.textContent = currentRole === 'admin' ? 'পরিচালক' : 
                              currentRole === 'teacher' ? 'শিক্ষক' : 'ছাত্র';
     loadAllData();
-    setTimeout(animateGloriousText, 200);
-}
-
-// ============================================================
-// NAVBAR SCROLL EFFECT
-// ============================================================
-window.addEventListener('scroll', function() {
-    const navbar = document.querySelector('.navbar');
-    if (navbar) {
-        navbar.classList.toggle('scrolled', window.scrollY > 30);
-    }
-});
-
-// ============================================================
-// BISMILLAH ANIMATION
-// ============================================================
-function animateBismillah() {
-    const bismillah = document.querySelector('.bismillah');
-    if (bismillah) {
-        setInterval(() => {
-            bismillah.style.transition = 'opacity 0.8s ease';
-            bismillah.style.opacity = '0.3';
-            setTimeout(() => {
-                bismillah.style.opacity = '0.8';
-            }, 400);
-        }, 4000);
-    }
+    setTimeout(animateGloriousText, 500);
 }
 
 // ============================================================
@@ -376,6 +372,7 @@ function loadAllData() {
     studentsRef.on('value', (snapshot) => {
         allStudents = snapshot.val() || {};
         renderClassButtons();
+        // সিলেক্টেড ক্লাসের ছাত্র দেখান
         if (selectedClass) {
             renderClassStudents(selectedClass);
         }
@@ -511,7 +508,7 @@ function renderFullRoutine() {
 }
 
 // ============================================================
-// RENDER TEACHERS - Office Coordinator Support
+// RENDER TEACHERS
 // ============================================================
 function renderTeachers() {
     const grid = document.getElementById('teachersGrid');
@@ -609,7 +606,7 @@ function populateClassCheckboxes() {
 }
 
 // ============================================================
-// ADD TEACHER - WITH OFFICE COORDINATOR
+// ADD TEACHER
 // ============================================================
 document.getElementById('createTeacherBtn').addEventListener('click', () => {
     const name = document.getElementById('newTeacherName').value.trim();
@@ -691,15 +688,40 @@ function renderTeacherProfile(teacherData) {
 }
 
 // ============================================================
-// CLASS BUTTONS - FIXED
+// CLASS SELECTION - DROPDOWN
+// ============================================================
+function setupClassDropdown() {
+    const dropdown = document.getElementById('classSelectDropdown');
+    if (!dropdown) return;
+    
+    dropdown.addEventListener('change', function() {
+        const selectedValue = this.value;
+        if (selectedValue) {
+            selectedClass = selectedValue;
+            
+            document.querySelectorAll('.class-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-class') === selectedValue) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            document.getElementById('selectedClassName').textContent = 
+                selectedValue === 'SSC Special' ? '🎯 ' + selectedValue : selectedValue;
+            
+            // শুধুমাত্র সিলেক্টেড ক্লাসের ছাত্র দেখান
+            renderClassStudents(selectedValue);
+            toggleGroupField(selectedValue);
+        }
+    });
+}
+
+// ============================================================
+// CLASS BUTTONS
 // ============================================================
 function renderClassButtons() {
     const container = document.getElementById('classButtons');
-    if (!container) {
-        console.error('classButtons element not found!');
-        return;
-    }
-    
+    if (!container) return;
     container.innerHTML = '<div class="class-buttons-container">';
     
     allClasses.forEach(cls => {
@@ -708,61 +730,39 @@ function renderClassButtons() {
         btn.textContent = cls === 'SSC Special' ? '🎯 ' + cls : cls;
         btn.setAttribute('data-class', cls);
         
-        btn.onclick = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            console.log('✅ ক্লাস সিলেক্ট করা হয়েছে:', cls);
-            
-            // সিলেক্টেড ক্লাস আপডেট করুন
+        btn.onclick = function() {
             selectedClass = cls;
             
-            // সব বাটন থেকে active ক্লাস রিমুভ করুন
-            document.querySelectorAll('.class-btn').forEach(b => {
-                b.classList.remove('active');
-            });
-            
-            // এই বাটনে active যোগ করুন
+            document.querySelectorAll('.class-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             
-            // সিলেক্টেড ক্লাসের নাম আপডেট করুন
-            const selectedNameSpan = document.getElementById('selectedClassName');
-            if (selectedNameSpan) {
-                selectedNameSpan.textContent = cls === 'SSC Special' ? '🎯 ' + cls : cls;
-            }
+            const dropdown = document.getElementById('classSelectDropdown');
+            if (dropdown) dropdown.value = cls;
             
-            // স্টুডেন্ট লিস্ট আপডেট করুন
+            document.getElementById('selectedClassName').textContent = 
+                cls === 'SSC Special' ? '🎯 ' + cls : cls;
+            
+            // শুধুমাত্র সিলেক্টেড ক্লাসের ছাত্র দেখান
             renderClassStudents(cls);
-            
-            // গ্রুপ ফিল্ড টগল করুন
             toggleGroupField(cls);
-            
-            console.log('✅ বর্তমান selectedClass:', selectedClass);
         };
         
         container.appendChild(btn);
     });
     container.innerHTML += '</div>';
     
-    // ✅ যদি কোন ক্লাস সিলেক্ট না থাকে, প্রথমটি সিলেক্ট করুন
+    // ড্রপডাউন সেটআপ
+    setupClassDropdown();
+    
+    // প্রথম ক্লাস অটো-সিলেক্ট
     if (!selectedClass) {
         const firstBtn = container.querySelector('.class-btn');
-        if (firstBtn) {
-            console.log('✅ প্রথম ক্লাস অটো-সিলেক্ট করা হচ্ছে:', firstBtn.getAttribute('data-class'));
-            firstBtn.click();
-        }
-    } else {
-        // সিলেক্টেড ক্লাস হাইলাইট করুন
-        document.querySelectorAll('.class-btn').forEach(b => {
-            if (b.getAttribute('data-class') === selectedClass) {
-                b.classList.add('active');
-            }
-        });
+        if (firstBtn) firstBtn.click();
     }
 }
 
 // ============================================================
-// CLASS STUDENTS
+// CLASS STUDENTS - শুধুমাত্র সিলেক্টেড ক্লাসের ছাত্র দেখাবে
 // ============================================================
 function renderClassStudents(className) {
     const container = document.getElementById('classStudentsTable');
@@ -772,10 +772,11 @@ function renderClassStudents(className) {
     }
     
     if (!className) {
-        container.innerHTML = '<p class="empty-state">ক্লাস নির্বাচন করুন</p>';
+        container.innerHTML = '<p class="empty-state">⚠️ দয়া করে একটি ক্লাস নির্বাচন করুন</p>';
         return;
     }
     
+    // শুধুমাত্র সিলেক্টেড ক্লাসের ছাত্র ফিল্টার করুন
     const students = {};
     for (let key in allStudents) {
         if (allStudents[key].class === className) {
@@ -783,12 +784,44 @@ function renderClassStudents(className) {
         }
     }
     
+    // ক্লাসের নাম ডিসপ্লে
+    const displayClassName = className === 'SSC Special' ? '🎯 SSC Special' : className;
+    
     if (Object.keys(students).length === 0) {
-        container.innerHTML = '<p class="empty-state">এই ক্লাসে কোনো ছাত্র/ছাত্রী নেই</p>';
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-user-graduate" style="font-size: 40px; display: block; margin-bottom: 12px; opacity: 0.3;"></i>
+                <p style="font-size: 18px; color: rgba(255,255,255,0.4);">${displayClassName} ক্লাসে কোনো ছাত্র/ছাত্রী নেই</p>
+                <p style="font-size: 14px; color: rgba(255,255,255,0.2);">উপরের ফর্ম ব্যবহার করে ছাত্র যোগ করুন</p>
+            </div>
+        `;
         return;
     }
     
-    let html = `<div class="table-responsive"><table><thead><tr><th>ছবি</th><th>নাম</th><th>আইডি</th><th>ক্লাস</th><th>গ্রুপ</th><th>অভিভাবকের মোবাইল</th><th>অ্যাকশন</th></tr></thead><tbody>`;
+    let html = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+            <h4 style="color: #ffd700; margin: 0;">
+                <i class="fas fa-users"></i> ${displayClassName} ক্লাসের ছাত্র/ছাত্রী (${Object.keys(students).length} জন)
+            </h4>
+            <span style="background: rgba(255,215,0,0.1); padding: 4px 16px; border-radius: 20px; font-size: 13px; color: rgba(255,255,255,0.6);">
+                <i class="fas fa-calendar-alt"></i> মোট: ${Object.keys(students).length}
+            </span>
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ছবি</th>
+                        <th>নাম</th>
+                        <th>আইডি</th>
+                        <th>ক্লাস</th>
+                        <th>গ্রুপ</th>
+                        <th>অভিভাবকের মোবাইল</th>
+                        <th>অ্যাকশন</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+    
     for (let key in students) {
         const s = students[key];
         let groupBadge = '-';
@@ -802,11 +835,11 @@ function renderClassStudents(className) {
         }
         html += `<tr>
             <td><img src="${s.image || 'https://ui-avatars.com/api/?background=0a3b2e&color=fff&name=' + encodeURIComponent(s.name)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;"></td>
-            <td>${s.name}</td>
+            <td><strong>${s.name}</strong></td>
             <td>${s.id}</td>
             <td>${s.class === 'SSC Special' ? '🎯 SSC Special' : s.class}</td>
             <td>${groupBadge}</td>
-            <td>${s.guardianPhone || ''}</td>
+            <td>${s.guardianPhone || '-'}</td>
             <td><button class="btn btn-red btn-sm" onclick="deleteStudent('${key}')">মুছুন</button></td>
         </tr>`;
     }
@@ -814,14 +847,32 @@ function renderClassStudents(className) {
     container.innerHTML = html;
 }
 
+// ============================================================
+// DELETE STUDENT - আপডেটেড
+// ============================================================
 window.deleteStudent = function(key) {
     if (confirm('ছাত্র/ছাত্রীকে মুছতে চান?')) {
-        db.ref('students/' + key).remove();
+        const studentRef = db.ref('students/' + key);
+        studentRef.once('value', (snapshot) => {
+            const studentData = snapshot.val();
+            if (studentData) {
+                const className = studentData.class;
+                studentRef.remove().then(() => {
+                    alert('✅ ছাত্র/ছাত্রী মুছে ফেলা হয়েছে');
+                    // শুধুমাত্র সিলেক্টেড ক্লাসের লিস্ট রিফ্রেশ
+                    if (selectedClass) {
+                        renderClassStudents(selectedClass);
+                    }
+                }).catch((error) => {
+                    alert('❌ মুছতে সমস্যা: ' + error.message);
+                });
+            }
+        });
     }
 };
 
 // ============================================================
-// ADD STUDENT - COMPLETELY FIXED
+// ADD STUDENT - আপডেটেড
 // ============================================================
 document.getElementById('addCousinBtn').addEventListener('click', function(e) {
     e.preventDefault();
@@ -832,41 +883,30 @@ document.getElementById('addCousinBtn').addEventListener('click', function(e) {
     const group = document.getElementById('cousinGroup').value;
     const guardianPhone = document.getElementById('cousinGuardianPhone').value.trim();
     
-    // ✅ নাম, আইডি, পাসওয়ার্ড চেক
     if (!name || !id || !password) {
-        alert('নাম, আইডি এবং পাসওয়ার্ড দিন');
+        alert('⚠️ নাম, আইডি এবং পাসওয়ার্ড দিন');
         return;
     }
     
-    // ✅ ক্লাস সিলেক্ট করা আছে কিনা চেক
-    console.log('🔍 বর্তমান selectedClass:', selectedClass);
-    
     if (!selectedClass) {
-        alert('⚠️ দয়া করে প্রথমে একটি ক্লাস নির্বাচন করুন!');
-        
-        // ক্লাস বাটনে ফোকাস করুন
-        const firstClassBtn = document.querySelector('.class-btn');
-        if (firstClassBtn) {
-            firstClassBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            firstClassBtn.style.transition = 'all 0.3s ease';
-            firstClassBtn.style.boxShadow = '0 0 30px rgba(255,215,0,0.5)';
+        alert('⚠️ দয়া করে একটি ক্লাস নির্বাচন করুন!');
+        const dropdown = document.getElementById('classSelectDropdown');
+        if (dropdown) {
+            dropdown.focus();
+            dropdown.style.borderColor = '#ffd700';
             setTimeout(() => {
-                firstClassBtn.style.boxShadow = 'none';
+                dropdown.style.borderColor = 'rgba(255,215,0,0.3)';
             }, 2000);
         }
         return;
     }
     
-    // ✅ গ্রুপ চেক (যদি প্রয়োজন হয়)
-    if (isGroupRequired(selectedClass)) {
-        if (!group) {
-            alert(`⚠️ ${selectedClass === 'SSC Special' ? '🎯 SSC Special' : selectedClass} শ্রেণির জন্য গ্রুপ নির্বাচন আবশ্যক!`);
-            document.getElementById('cousinGroup').focus();
-            return;
-        }
+    if (isGroupRequired(selectedClass) && !group) {
+        alert(`⚠️ ${selectedClass} শ্রেণির জন্য গ্রুপ নির্বাচন আবশ্যক!`);
+        document.getElementById('cousinGroup').focus();
+        return;
     }
     
-    // ✅ সব ঠিক থাকলে ডাটাবেজে সেভ করুন
     const newStudent = {
         name: name,
         id: id,
@@ -874,29 +914,27 @@ document.getElementById('addCousinBtn').addEventListener('click', function(e) {
         class: selectedClass,
         group: group || '',
         guardianPhone: guardianPhone || '',
-        image: document.getElementById('studentImagePreview').src || 'https://ui-avatars.com/api/?background=0a3b2e&color=fff&name=' + encodeURIComponent(name)
+        image: document.getElementById('studentImagePreview').src || 
+               'https://ui-avatars.com/api/?background=0a3b2e&color=fff&name=' + encodeURIComponent(name)
     };
     
     const newRef = db.ref('students').push();
     newRef.set(newStudent)
         .then(() => {
-            // ফর্ম ক্লিয়ার করুন
             document.getElementById('cousinName').value = '';
             document.getElementById('cousinId').value = '';
             document.getElementById('cousinPass').value = '';
             document.getElementById('cousinGroup').value = '';
             document.getElementById('cousinGuardianPhone').value = '';
-            alert('✅ ছাত্র/ছাত্রী যোগ করা হয়েছে');
-            
-            // তালিকা রিফ্রেশ করুন
+            alert(`✅ ${selectedClass} ক্লাসে ছাত্র/ছাত্রী যোগ করা হয়েছে`);
+            // শুধুমাত্র সিলেক্টেড ক্লাসের লিস্ট রিফ্রেশ
             renderClassStudents(selectedClass);
         })
         .catch((error) => {
-            alert('❌ যোগ করতে সমস্যা হয়েছে: ' + error.message);
+            alert('❌ যোগ করতে সমস্যা: ' + error.message);
         });
 });
 
-// Student Image Upload
 document.getElementById('studentImageInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
@@ -2170,12 +2208,11 @@ document.getElementById('saveAllRoutinesBtn')?.addEventListener('click', () => {
 });
 
 // ============================================================
-// INITIALIZE ON DOM READY
+// INITIALIZE
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(animateGloriousText, 100);
-    setTimeout(animateLoginGloriousText, 50);
-    setTimeout(animateBismillah, 200);
+    animateLoginGloriousText();
+    animateBismillah();
     
     const hasSession = checkSession();
     if (!hasSession) {
@@ -2184,6 +2221,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 console.log('📚 GLORIOUS Education Care সিস্টেম লোড হয়েছে');
-console.log('🔥 Firebase Connected');
-console.log('✅ অটো-সেভ সক্রিয় আছে');
-console.log('✅ Office Coordinator ফিচার যোগ করা হয়েছে');
+console.log('✅ সব ফিচার সক্রিয় আছে');
+console.log('✅ প্রতিটি ক্লাসের ছাত্র আলাদা থাকবে');
